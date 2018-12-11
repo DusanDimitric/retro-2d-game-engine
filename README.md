@@ -8,10 +8,13 @@
 
 ## Run it:
 
+#### 1. Step
+Run:
 ```
 make
-# Open index.html in your browser
 ```
+#### 2. Step
+Open index.html in your browser
 
 ## Check for TypeScript validity:
 
