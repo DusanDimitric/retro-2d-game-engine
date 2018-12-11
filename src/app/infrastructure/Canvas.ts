@@ -10,20 +10,22 @@ canvas.style.height = CONFIG.SCALE !== 1 ? (CONFIG.SCALE * CONFIG.CANVAS_HEIGHT)
 const context = canvas.getContext('2d')
 
 export default class Canvas {
-  static drawRect(rect: Box): void {
-    context.strokeStyle = rect.color
+  static drawRect(box: Box): void {
+    context.strokeStyle = box.color
     context.lineWidth = 1
     context.beginPath()
-      context.moveTo(0.5 + rect.row * CONFIG.TILE_SIZE,                    0.5 + rect.col * CONFIG.TILE_SIZE)
-      context.lineTo(0.5 + rect.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, 0.5 + rect.col * CONFIG.TILE_SIZE)
-      context.lineTo(0.5 + rect.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, 0.5 + rect.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
-      context.lineTo(0.5 + rect.row * CONFIG.TILE_SIZE                   , 0.5 + rect.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
-      context.lineTo(0.5 + rect.row * CONFIG.TILE_SIZE,                    0.5 + rect.col * CONFIG.TILE_SIZE)
+      // Draw box outline
+      context.moveTo( 0.5 + box.row * CONFIG.TILE_SIZE,                     0.5 + box.col * CONFIG.TILE_SIZE)
+      context.lineTo(-0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE,  0.5 + box.col * CONFIG.TILE_SIZE)
+      context.lineTo(-0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, -0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
+      context.lineTo( 0.5 + box.row * CONFIG.TILE_SIZE                   , -0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
+      context.lineTo( 0.5 + box.row * CONFIG.TILE_SIZE,                     0.5 + box.col * CONFIG.TILE_SIZE)
 
-      context.moveTo(0.5 + rect.row * CONFIG.TILE_SIZE,                    0.5 + rect.col * CONFIG.TILE_SIZE)
-      context.lineTo(0.5 + rect.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, 0.5 + rect.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
-      context.moveTo(0.5 + rect.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, 0.5 + rect.col * CONFIG.TILE_SIZE)
-      context.lineTo(0.5 + rect.row * CONFIG.TILE_SIZE,                    0.5 + rect.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
+      // Draw 'x' accross the box
+      context.moveTo( 0.5 + box.row * CONFIG.TILE_SIZE,                     0.5 + box.col * CONFIG.TILE_SIZE)
+      context.lineTo(-0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, -0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
+      context.moveTo(-0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE,  0.5 + box.col * CONFIG.TILE_SIZE)
+      context.lineTo( 0.5 + box.row * CONFIG.TILE_SIZE,                    -0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
     context.stroke()
   }
 }
