@@ -6,13 +6,12 @@ export default class Grid {
   rows: number = CONFIG.CANVAS_WIDTH / CONFIG.TILE_SIZE
   cols: number = CONFIG.CANVAS_HEIGHT / CONFIG.TILE_SIZE
 
-
   constructor() {
-    this.initializeMap()
+    this.initializeGrid()
     this.loadMap(Map01)
   }
   
-  private initializeMap() {
+  private initializeGrid() {
     for (let row = 0; row < this.rows; ++row) {
       this.map.push([])
       for (let col = 0; col < this.cols; ++col) {
