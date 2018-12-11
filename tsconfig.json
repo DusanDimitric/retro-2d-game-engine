@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./build/",
+    "resolveJsonModule": true,
+    "strictNullChecks": false,
+    "strict": true,
+    "module": "commonjs",
+    "target": "ESNext",
+    "sourceMap": true,
+    "baseUrl": "./src/",
+    "paths": {
+      "@app/*": [ "./app/*" ]
+    }
+  }
+}

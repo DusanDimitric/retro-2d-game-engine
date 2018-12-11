@@ -1,0 +1,16 @@
+# Build artifacts
+build/
+
+# Dependency directory
+node_modules/
+
+# Code editors
+*.swp
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS generated
+.DS_Store
