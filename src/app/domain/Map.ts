@@ -3,42 +3,54 @@ import Grid from '@app/domain/Grid'
 import Canvas from '@app/infrastructure/Canvas'
 import Box from '@app/infrastructure/objects/primitives/Box'
 
+import * as Map01 from '@app/resources/maps/Map-01.json'
+
 export default class Map {
-  private tiles: { [key: number]: Box } = {
-    0: {
-      color: '#572F17',
-      row: 0,
-      col: 0,
-    },
-    1: {
-      color: '#403550',
-      row: 0,
-      col: 0,
-    },
-    2: {
-      color: '#27531B',
-      row: 0,
-      col: 0,
-    }
+  private boxes: Box[] = []
+
+  constructor(private grid: Grid) {
+    this.loadMap(Map01)
   }
-  constructor(
-    private grid: Grid
-  ) {}
 
-  draw() {
-    const rect: Box = this.tiles[0]
+  public draw(): void {
+    this.boxes.forEach((box: Box) => {
+      Canvas.drawBox(box)
+    })
+  }
 
-    let tile
-    for (let row = 0; row < this.grid.rows; ++row) {
-      for (let col = 0; col < this.grid.cols; ++col) {
+  private loadMap(map: number[]): void {
+    if (this.grid.rows * this.grid.cols !== map.length) {
+      console.error(`Expected - columns: ${this.grid.cols}, rows: ${this.grid.rows}`)
+      throw new Error(`Invalid Map file: ${map}`)
+    }
 
-        // TODO: Turn tiles into objects
-        if (Math.random() > 0.8 ? 1 : 0) {
-          tile = this.tiles[Math.round(Math.random() * 1.7)]
-          tile.row = row
-          tile.col = col
-          Canvas.drawRect(tile)
-        }
+    let row: number, col: number
+    for (let i = 0; i < map.length; ++i) {
+      col = i % this.grid.cols
+      row = Math.floor(i / this.grid.cols)
+      console.log(col, row)
+      switch (map[i]) {
+        case 1:
+          this.boxes.push({
+            color: '#572F17',
+            col,
+            row
+          })
+          break
+        case 2:
+          this.boxes.push({
+            color: '#403550',
+            col,
+            row
+          })
+          break
+        case 3:
+          this.boxes.push({
+            color: '#27531B',
+            col,
+            row
+          })
+          break
       }
     }
   }

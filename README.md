@@ -1,6 +1,6 @@
 # Retro 2D Game Engine (in TypeScript)
 
-![screenshot](https://framapic.org/random?i=6gXgyWbiyrht/lNKljZuXgHK1 "Screenshot")
+![screenshot](https://framapic.org/B1mgKPxP1smv/4Kida0z151O7 "Screenshot")
 
 ## Run it:
 

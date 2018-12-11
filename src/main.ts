@@ -1,10 +1,4 @@
-import Mouse from '@app/interfaces/Mouse'
+import Game from '@app/infrastructure/Game'
 
-import Grid from '@app/domain/Grid'
-import Map from '@app/domain/Map'
-
-const mouse = new Mouse()
-
-const grid = new Grid()
-const map = new Map(grid)
-map.draw()
+const game: Game = new Game()
+game.start()
