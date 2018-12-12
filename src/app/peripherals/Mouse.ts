@@ -1,29 +1,25 @@
 import Canvas from '@app/infrastructure/Canvas'
+import Player from '@app/domain/Player'
 
 export default class Mouse {
-	x: number = 0
-	y: number = 0
-
-  constructor() {
+	public static x: number = 0
+	public static y: number = 0
+  public static init() {
     this.hijackRightClick()
-    this.activateCrosshair()
+    this.trackMouseOnCanvas()
   }
 
-  private hijackRightClick(): void {
-    window.addEventListener('contextmenu', function() {
-      arguments[0].preventDefault()
+  private static hijackRightClick(): void {
+    window.addEventListener('contextmenu', e => {
+      e.preventDefault()
     }, false)
   }
 
-  private activateCrosshair(): void {
+  private static trackMouseOnCanvas(): void {
     const canvas: HTMLCanvasElement = Canvas.getCanvasDomElement()
     canvas.addEventListener('mousemove', e => {
 			this.x = e.pageX
 			this.y = e.pageY
     }, false)
   }
-
-	public render(): void {
-		Canvas.drawCrosshair(this.x, this.y)
-	}
 }

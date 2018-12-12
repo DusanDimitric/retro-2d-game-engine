@@ -1,6 +1,7 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import Player from '@app/domain/Player'
+import Mouse from '@app/peripherals/Mouse'
 import Box from './objects/primitives/Box'
 
 const canvas = <HTMLCanvasElement> document.getElementById('canvas')
@@ -41,12 +42,11 @@ export default class Canvas {
       context.moveTo(p.x, p.y)
       context.lineTo(p.x + 5, p.y + 5)
     context.stroke()
-    
   }
 
-  public static drawCrosshair(x: number, y: number): void {
-    const canvasX: number = x - canvas.offsetLeft
-    const canvasY: number = y - canvas.offsetTop
+  public static drawCrosshair(): void {
+    const canvasX: number = Mouse.x - canvas.offsetLeft
+    const canvasY: number = Mouse.y - canvas.offsetTop
     let offsetX, offsetY
     context.strokeStyle = '#FFFFFF'
     context.lineWidth = 0.5
@@ -76,6 +76,17 @@ export default class Canvas {
       context.moveTo(canvasX + offsetX, canvasY + offsetY)
       offsetX = 4.5
       context.lineTo(canvasX + offsetX, canvasY + offsetY)
+    context.stroke()
+  }
+
+  public static drawPlayerVisionRay(p: Player): void {
+    const canvasMouseX: number = Mouse.x - canvas.offsetLeft + 0.5
+    const canvasMouseY: number = Mouse.y - canvas.offsetTop  + 0.5
+    context.strokeStyle = '#88FF88'
+    context.lineWidth = 0.2
+    context.beginPath()
+      context.moveTo(p.x, p.y)
+      context.lineTo(canvasMouseX, canvasMouseY)
     context.stroke()
   }
 

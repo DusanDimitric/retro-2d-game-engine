@@ -9,8 +9,8 @@ const grid: Grid = new Grid()
 const map: Map = new Map(grid)
 const player: Player = new Player(100, 100)
 
-const kbd: Keyboard = new Keyboard(player)
-const mouse: Mouse = new Mouse()
+Keyboard.init(player)
+Mouse.init()
 
 export default class Game {
   public start(): void {
@@ -31,6 +31,5 @@ export default class Game {
 	  Canvas.clear()
     map.draw()
     player.draw()
-		mouse.render()
   }
 }
