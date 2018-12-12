@@ -1,11 +1,16 @@
 import Canvas from '@app/infrastructure/Canvas'
 import Mouse from '@app/peripherals/Mouse'
+import Keyboard from '@app/peripherals/Keyboard'
 import Grid from '@app/domain/Grid'
 import Map from '@app/domain/Map'
+import Player from '@app/domain/Player'
 
-const mouse: Mouse = new Mouse()
 const grid: Grid = new Grid()
 const map: Map = new Map(grid)
+const player: Player = new Player(100, 100)
+
+const kbd: Keyboard = new Keyboard(player)
+const mouse: Mouse = new Mouse()
 
 export default class Game {
   public start(): void {
@@ -13,14 +18,19 @@ export default class Game {
   }
 
 	private gameLoop(): void {
-		// update()
+		this.update()
 		this.render()
 		window.requestAnimationFrame(() => this.gameLoop())
 	}
 
+  private update(): void {
+    player.update()
+  }
+
   private render(): void {
 	  Canvas.clear()
     map.draw()
+    player.draw()
 		mouse.render()
   }
 }

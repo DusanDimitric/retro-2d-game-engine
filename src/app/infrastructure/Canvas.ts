@@ -1,5 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 
+import Player from '@app/domain/Player'
 import Box from './objects/primitives/Box'
 
 const canvas = <HTMLCanvasElement> document.getElementById('canvas')
@@ -10,6 +11,10 @@ canvas.style.height = CONFIG.SCALE !== 1 ? (CONFIG.SCALE * CONFIG.CANVAS_HEIGHT)
 const context = canvas.getContext('2d')
 
 export default class Canvas {
+	public static clear(): void {
+		context.clearRect(0, 0, canvas.width, canvas.height)
+	}
+
   public static drawBox(box: Box): void {
     context.strokeStyle = box.color
     context.lineWidth = 1
@@ -27,6 +32,16 @@ export default class Canvas {
       context.moveTo(-0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE,  0.5 + box.row * CONFIG.TILE_SIZE)
       context.lineTo( 0.5 + box.col * CONFIG.TILE_SIZE,                    -0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
     context.stroke()
+  }
+  
+  public static drawPlayer(p: Player) {
+    context.strokeStyle = '#EF0000'
+    context.lineWidth = 2
+    context.beginPath()
+      context.moveTo(p.x, p.y)
+      context.lineTo(p.x + 5, p.y + 5)
+    context.stroke()
+    
   }
 
   public static drawCrosshair(x: number, y: number): void {
@@ -63,10 +78,6 @@ export default class Canvas {
       context.lineTo(canvasX + offsetX, canvasY + offsetY)
     context.stroke()
   }
-
-	public static clear(): void {
-		context.clearRect(0, 0, canvas.width, canvas.height)
-	}
 
   public static getCanvasDomElement(): HTMLCanvasElement {
     return canvas

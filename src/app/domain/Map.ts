@@ -28,7 +28,6 @@ export default class Map {
     for (let i = 0; i < map.length; ++i) {
       col = i % this.grid.cols
       row = Math.floor(i / this.grid.cols)
-      console.log(col, row)
       switch (map[i]) {
         case 1:
           this.boxes.push({
