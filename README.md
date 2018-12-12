@@ -1,8 +1,12 @@
 # Retro 2D Game Engine (in TypeScript)
 
+## Live demo:
+
+https://dusandimitric.github.io/retro-2d-game-engine-demo/
+
 ![screenshot](https://framapic.org/B1mgKPxP1smv/4Kida0z151O7 "Screenshot")
 
-## Run it:
+## Run it locally:
 
 #### 1. Step
 Run:
