@@ -36,11 +36,24 @@ export default class Canvas {
   }
   
   public static drawPlayer(p: Player) {
-    context.strokeStyle = '#EF0000'
-    context.lineWidth = 2
     context.beginPath()
+      context.fillStyle = '#00AA00'
+      context.font = "10px Monospace"
+
+      context.fillText(`p (${p.x}, ${p.y})`, 50, 50)
+      const canvasX: number = Mouse.x - canvas.offsetLeft
+      const canvasY: number = Mouse.y - canvas.offsetTop
+      context.fillText(`m (${canvasX}, ${canvasY})`, 50, 62)
+      const dx = canvasX - p.x
+      const dy = canvasY - p.y
+      context.fillText(`d (${dx}, ${dy})`, 50, 74)
+      const theta = Math.atan2((dy), (dx))
+      context.fillText(`θ = ${theta}`, 50, 86)
+
+      context.strokeStyle = '#523DA5'
+      context.lineWidth = 2
       context.moveTo(p.x, p.y)
-      context.lineTo(p.x + 5, p.y + 5)
+      context.lineTo(p.x + (p.sightLineLength * Math.cos(theta)), p.y + (p.sightLineLength * Math.sin(theta)))
     context.stroke()
   }
 
@@ -82,7 +95,7 @@ export default class Canvas {
   public static drawPlayerVisionRay(p: Player): void {
     const canvasMouseX: number = Mouse.x - canvas.offsetLeft + 0.5
     const canvasMouseY: number = Mouse.y - canvas.offsetTop  + 0.5
-    context.strokeStyle = '#88FF88'
+    context.strokeStyle = '#FF4444'
     context.lineWidth = 0.2
     context.beginPath()
       context.moveTo(p.x, p.y)

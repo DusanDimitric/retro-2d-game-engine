@@ -9,6 +9,7 @@ export default class Player {
     up    : false,
     down  : false,
   }
+  public sightLineLength = 10
 
   constructor(public x: number, public y: number) {}
 
