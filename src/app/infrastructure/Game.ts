@@ -10,7 +10,7 @@ const map: Map = new Map(grid)
 const player: Player = new Player(100, 100)
 
 Keyboard.init(player)
-Mouse.init()
+Mouse.init(player)
 
 export default class Game {
   public start(): void {

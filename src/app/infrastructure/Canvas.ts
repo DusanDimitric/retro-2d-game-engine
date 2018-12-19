@@ -1,6 +1,7 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import Player from '@app/domain/Player'
+import Projectile from '@app/domain/Projectile'
 import Mouse from '@app/peripherals/Mouse'
 import Box from './objects/primitives/Box'
 
@@ -93,8 +94,8 @@ export default class Canvas {
   }
 
   public static drawPlayerVisionRay(p: Player): void {
-    const canvasMouseX: number = Mouse.x - canvas.offsetLeft + 0.5
-    const canvasMouseY: number = Mouse.y - canvas.offsetTop  + 0.5
+    const canvasMouseX: number = Canvas.getCanvasMouseX()
+    const canvasMouseY: number = Canvas.getCanvasMouseY()
     context.strokeStyle = '#FF4444'
     context.lineWidth = 0.2
     context.beginPath()
@@ -103,7 +104,18 @@ export default class Canvas {
     context.stroke()
   }
 
-  public static getCanvasDomElement(): HTMLCanvasElement {
-    return canvas
+  public static drawProjectiles (projectiles: Projectile[]) {
+    context.fillStyle = '#FFFFFF'
+    context.lineWidth = 1
+    projectiles.forEach(p => {
+      // context.fillRect(p.x, p.y, 1, 1)
+      context.beginPath()
+      context.arc(p.x, p.y, 2, 0, (2 * Math.PI))
+      context.stroke()
+    })
   }
+
+  public static getCanvasDomElement = (): HTMLCanvasElement => canvas
+  public static getCanvasMouseX = (): number => Mouse.x - canvas.offsetLeft + 0.5
+  public static getCanvasMouseY = (): number => Mouse.y - canvas.offsetTop  + 0.5
 }
