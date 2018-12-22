@@ -27,3 +27,9 @@ npx tsc -p tsconfig.json
 ## Color palette:
 
 (Heretic) https://zdoom.org/wiki/Palette
+
+## Attribution:
+
+### Sound FX
+
+* MP5 SMG 9mm - By GunGuru from http://soundbible.com/2091-MP5-SMG-9mm.html

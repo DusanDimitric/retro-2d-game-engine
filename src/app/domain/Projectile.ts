@@ -1,5 +1,5 @@
 export default class Projectile {
-  public speed: number = 14
+  public speed: number = 24
   constructor (
     public x: number,
     public y: number,

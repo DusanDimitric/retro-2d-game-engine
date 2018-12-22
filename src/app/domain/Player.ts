@@ -3,6 +3,8 @@ import Canvas from '@app/infrastructure/Canvas'
 
 import Projectile from '@app/domain/Projectile'
 
+import SoundFX from '@app/audio/SoundFX'
+
 export default class Player {
   public rotation: number = 0
   private maxSpeed = 3
@@ -51,6 +53,7 @@ export default class Player {
       let yVel = dy / ( Math.abs(dx) + Math.abs(dy) )
 
       // TODO: Insert accuracy skill to reduce bullet motion randomness
+      // TODO: Fix the problem with different bullet speeds caused by randomness
       const randomFactorX = Math.random() * 0.1 - 0.05
       const randomFactorY = Math.random() * 0.1 - 0.05
       xVel += randomFactorX
@@ -58,6 +61,8 @@ export default class Player {
 
       this.projectiles.push(new Projectile(this.x, this.y, xVel, yVel))
       this.shootingCooldown = 6
+
+      SoundFX.playSMG()
     } else {
       --this.shootingCooldown
     }

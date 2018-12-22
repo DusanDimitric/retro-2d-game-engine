@@ -4,7 +4,12 @@ import Keyboard from '@app/peripherals/Keyboard'
 import Grid from '@app/domain/Grid'
 import Map from '@app/domain/Map'
 import Player from '@app/domain/Player'
+import AudioLoader from '@app/audio/AudioLoader'
 
+// Load all assets
+AudioLoader.load()
+
+// Initialize the game
 const grid: Grid = new Grid()
 const map: Map = new Map(grid)
 const player: Player = new Player(100, 100)
