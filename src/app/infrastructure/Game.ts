@@ -1,6 +1,7 @@
 import Canvas from '@app/infrastructure/Canvas'
 import Mouse from '@app/peripherals/Mouse'
 import Keyboard from '@app/peripherals/Keyboard'
+import Gamepad from '@app/peripherals/Gamepad'
 import Grid from '@app/domain/Grid'
 import Map from '@app/domain/Map'
 import Player from '@app/domain/Player'
@@ -16,6 +17,7 @@ const map: Map = new Map(grid, player)
 
 Keyboard.init(player)
 Mouse.init(player)
+Gamepad.init(player)
 
 export default class Game {
   public start(): void {
