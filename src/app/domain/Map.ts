@@ -2,6 +2,7 @@ import Grid from '@app/domain/Grid'
 
 import Canvas from '@app/infrastructure/Canvas'
 import Box from '@app/infrastructure/objects/primitives/Box'
+import BoxFactory from '@app/domain/factories/BoxFactory'
 
 import * as Map01 from '@app/resources/maps/Map-01.json'
 
@@ -30,25 +31,13 @@ export default class Map {
       row = Math.floor(i / this.grid.cols)
       switch (map[i]) {
         case 1:
-          this.boxes.push({
-            color: '#572F17',
-            col,
-            row
-          })
+          this.boxes.push(BoxFactory.createBox('#572F17', col, row))
           break
         case 2:
-          this.boxes.push({
-            color: '#403550',
-            col,
-            row
-          })
+          this.boxes.push(BoxFactory.createBox('#403550', col, row))
           break
         case 3:
-          this.boxes.push({
-            color: '#27531B',
-            col,
-            row
-          })
+          this.boxes.push(BoxFactory.createBox('#27531B', col, row))
           break
       }
     }
