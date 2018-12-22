@@ -1,4 +1,5 @@
 import * as CONFIG from '@app/configuration/config.json'
+import { gameObjects } from '@app/domain/Map'
 
 export default class Projectile {
   public speed: number = 24
@@ -22,6 +23,23 @@ export default class Projectile {
     )
     {
       this.alive = false
+    }
+
+    let o
+    for (let row = 0; row < gameObjects.length; ++row) {
+      for (let col = 0; col < gameObjects[row].length; ++col) {
+        o = gameObjects[row][col]
+        if (o) {
+          if (
+            this.x >= o.x && this.x <= o.x + o.width &&
+            this.y >= o.y && this.y <= o.y + o.height
+          )
+          {
+            this.alive = false
+            gameObjects[row][col] = null
+          }
+        }
+      }
     }
   }
 }
