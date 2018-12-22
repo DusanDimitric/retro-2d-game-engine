@@ -7,7 +7,7 @@ import SoundFX from '@app/audio/SoundFX'
 
 export default class Player {
   public rotation: number = 0
-  private maxSpeed = 3
+  private maxSpeed = 4
   public moving = {
     left  : false,
     right : false,

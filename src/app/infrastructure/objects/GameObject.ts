@@ -3,7 +3,6 @@ export default abstract class GameObject {
   public y: number
 
   constructor(
-    // TODO: Change all fields to private
     public color: string,
     public row: number,
     public col: number,
