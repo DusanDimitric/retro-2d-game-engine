@@ -19,26 +19,20 @@ export default class Map {
     })
   }
 
-  private loadMap(map: number[]): void {
-    if (this.grid.rows * this.grid.cols !== map.length) {
-      console.error(`Expected - columns: ${this.grid.cols}, rows: ${this.grid.rows}`)
-      throw new Error(`Invalid Map file: ${map}`)
-    }
-
-    let row: number, col: number
-    for (let i = 0; i < map.length; ++i) {
-      col = i % this.grid.cols
-      row = Math.floor(i / this.grid.cols)
-      switch (map[i]) {
-        case 1:
-          this.boxes.push(BoxFactory.createBox('#572F17', col, row))
-          break
-        case 2:
-          this.boxes.push(BoxFactory.createBox('#403550', col, row))
-          break
-        case 3:
-          this.boxes.push(BoxFactory.createBox('#27531B', col, row))
-          break
+  private loadMap(map: number[][]): void {
+    for (let row = 0; row < map.length; ++row) {
+      for (let col = 0; col < map[row].length; ++col) {
+        switch (map[row][col]) {
+          case 1:
+            this.boxes.push(BoxFactory.createBox('#572F17', col, row))
+            break
+          case 2:
+            this.boxes.push(BoxFactory.createBox('#403550', col, row))
+            break
+          case 3:
+            this.boxes.push(BoxFactory.createBox('#27531B', col, row))
+            break
+        }
       }
     }
   }
