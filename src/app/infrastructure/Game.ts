@@ -11,8 +11,9 @@ AudioLoader.load()
 
 // Initialize the game
 const grid: Grid = new Grid()
-const map: Map = new Map(grid)
-const player: Player = new Player(100, 100)
+const player: Player = new Player(32, 32)
+// const player: Player = new Player(240, 160)
+const map: Map = new Map(grid, player)
 
 Keyboard.init(player)
 Mouse.init(player)

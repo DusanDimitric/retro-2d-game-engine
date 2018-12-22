@@ -14,12 +14,20 @@ export default class Player {
     up    : false,
     down  : false,
   }
+  public row: number
+  public col: number
   public sightLineLength = 10
   private shooting = false
   private shootingCooldown = 6
   private projectiles: Projectile[] = []
 
-  constructor(public x: number, public y: number) {}
+  constructor(
+    public x: number,
+    public y: number,
+  )
+  {
+    this.updateMapPosition()
+  }
 
   public update(): void {
     this.move()
@@ -40,6 +48,13 @@ export default class Player {
     if (this.moving.down) {
       this.y += this.maxSpeed
     }
+    this.updateMapPosition()
+  }
+
+  // TODO: Do we need this?
+  private updateMapPosition(): void {
+    this.row = Math.floor(this.y / CONFIG.TILE_SIZE)
+    this.col = Math.floor(this.x / CONFIG.TILE_SIZE)
   }
 
   public shoot(): void {
@@ -47,8 +62,8 @@ export default class Player {
       const canvasMouseX: number = Canvas.getCanvasMouseX()
       const canvasMouseY: number = Canvas.getCanvasMouseY()
 
-      const dx = (canvasMouseX - this.x)
-      const dy = (canvasMouseY - this.y)
+      const dx = (canvasMouseX - Canvas.center.x)
+      const dy = (canvasMouseY - Canvas.center.y)
       let xVel = dx / ( Math.abs(dx) + Math.abs(dy) )
       let yVel = dy / ( Math.abs(dx) + Math.abs(dy) )
 
@@ -59,7 +74,7 @@ export default class Player {
       xVel += randomFactorX
       yVel += randomFactorY
 
-      this.projectiles.push(new Projectile(this.x, this.y, xVel, yVel))
+      this.projectiles.push(new Projectile(Canvas.center.x, Canvas.center.y, xVel, yVel))
       this.shootingCooldown = 6
 
       SoundFX.playSMG()

@@ -3,13 +3,13 @@ import * as CONFIG from '../../configuration/config.json'
 import Box from '@app/infrastructure/objects/primitives/Box'
 
 export default class BoxFactory {
-  public static createBox(color: string, col: number, row: number): Box {
-    return {
+  public static createBox(color: string, row: number, col: number): Box {
+    return new Box(
       color,
-      col,
       row,
-      width: CONFIG.TILE_SIZE,
-      height: CONFIG.TILE_SIZE,
-    }
+      col,
+      CONFIG.TILE_SIZE,
+      CONFIG.TILE_SIZE,
+    )
   }
 }

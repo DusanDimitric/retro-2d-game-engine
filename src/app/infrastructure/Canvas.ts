@@ -13,6 +13,18 @@ canvas.style.height = CONFIG.SCALE !== 1 ? (CONFIG.SCALE * CONFIG.CANVAS_HEIGHT)
 const context = canvas.getContext('2d')
 
 export default class Canvas {
+  public static rows = Math.floor(canvas.height / CONFIG.TILE_SIZE)
+  public static cols = Math.floor(canvas.width  / CONFIG.TILE_SIZE)
+  public static halfRows = Math.floor((canvas.height / 2) / CONFIG.TILE_SIZE)
+  public static halfCols = Math.floor((canvas.width  / 2) / CONFIG.TILE_SIZE)
+  public static rowRemainder = (canvas.height / 2) % CONFIG.TILE_SIZE
+  public static colRemainder = (canvas.width  / 2) % CONFIG.TILE_SIZE
+
+  public static center: { x: number, y: number } = {
+    x: CONFIG.CANVAS_WIDTH  / 2,
+    y: CONFIG.CANVAS_HEIGHT / 2,
+  }
+
 	public static clear(): void {
 		context.clearRect(0, 0, canvas.width, canvas.height)
 	}
@@ -22,17 +34,17 @@ export default class Canvas {
     context.lineWidth = 1
     context.beginPath()
       // Draw box outline
-      context.moveTo( 0.5 + box.col * CONFIG.TILE_SIZE,                     0.5 + box.row * CONFIG.TILE_SIZE)
-      context.lineTo(-0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE,  0.5 + box.row * CONFIG.TILE_SIZE)
-      context.lineTo(-0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, -0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
-      context.lineTo( 0.5 + box.col * CONFIG.TILE_SIZE                   , -0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
-      context.lineTo( 0.5 + box.col * CONFIG.TILE_SIZE,                     0.5 + box.row * CONFIG.TILE_SIZE)
+      context.moveTo( 0.5 + box.x,                     0.5 + box.y)
+      context.lineTo(-0.5 + box.x + CONFIG.TILE_SIZE,  0.5 + box.y)
+      context.lineTo(-0.5 + box.x + CONFIG.TILE_SIZE, -0.5 + box.y + CONFIG.TILE_SIZE)
+      context.lineTo( 0.5 + box.x                   , -0.5 + box.y + CONFIG.TILE_SIZE)
+      context.lineTo( 0.5 + box.x,                     0.5 + box.y)
 
       // Draw 'x' accross the box
-      context.moveTo( 0.5 + box.col * CONFIG.TILE_SIZE,                     0.5 + box.row * CONFIG.TILE_SIZE)
-      context.lineTo(-0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE, -0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
-      context.moveTo(-0.5 + box.col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE,  0.5 + box.row * CONFIG.TILE_SIZE)
-      context.lineTo( 0.5 + box.col * CONFIG.TILE_SIZE,                    -0.5 + box.row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE)
+      context.moveTo( 0.5 + box.x,                     0.5 + box.y)
+      context.lineTo(-0.5 + box.x + CONFIG.TILE_SIZE, -0.5 + box.y + CONFIG.TILE_SIZE)
+      context.moveTo(-0.5 + box.x + CONFIG.TILE_SIZE,  0.5 + box.y)
+      context.lineTo( 0.5 + box.x,                    -0.5 + box.y + CONFIG.TILE_SIZE)
     context.stroke()
   }
   
@@ -45,16 +57,16 @@ export default class Canvas {
       const canvasX: number = Mouse.x - canvas.offsetLeft
       const canvasY: number = Mouse.y - canvas.offsetTop
       context.fillText(`m (${canvasX}, ${canvasY})`, 50, 62)
-      const dx = canvasX - p.x
-      const dy = canvasY - p.y
+      const dx = canvasX - this.center.x
+      const dy = canvasY - this.center.y
       context.fillText(`d (${dx}, ${dy})`, 50, 74)
       const theta = Math.atan2((dy), (dx))
       context.fillText(`θ = ${theta}`, 50, 86)
 
       context.strokeStyle = '#523DA5'
       context.lineWidth = 2
-      context.moveTo(p.x, p.y)
-      context.lineTo(p.x + (p.sightLineLength * Math.cos(theta)), p.y + (p.sightLineLength * Math.sin(theta)))
+      context.moveTo(this.center.x, this.center.y)
+      context.lineTo(this.center.x + (p.sightLineLength * Math.cos(theta)), this.center.y + (p.sightLineLength * Math.sin(theta)))
     context.stroke()
   }
 
@@ -99,7 +111,7 @@ export default class Canvas {
     context.strokeStyle = '#FF4444'
     context.lineWidth = 0.2
     context.beginPath()
-      context.moveTo(p.x, p.y)
+      context.moveTo(this.center.x, this.center.y)
       context.lineTo(canvasMouseX, canvasMouseY)
     context.stroke()
   }
@@ -108,7 +120,6 @@ export default class Canvas {
     context.fillStyle = '#FFFFFF'
     context.lineWidth = 1
     projectiles.forEach(p => {
-      // context.fillRect(p.x, p.y, 1, 1)
       context.beginPath()
       context.arc(p.x, p.y, 2, 0, (2 * Math.PI))
       context.stroke()
