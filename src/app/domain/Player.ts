@@ -32,7 +32,12 @@ export default class Player {
   public update(): void {
     this.move()
     this.shoot()
-    this.updateProjectiles()
+    this.projectiles.forEach((p, i) => {
+      p.update()
+      if (p.alive === false) {
+        this.projectiles.splice(i, 1) // Remove the projectile
+      }
+    })
   }
 
   public move(): void {
@@ -81,21 +86,6 @@ export default class Player {
     } else {
       --this.shootingCooldown
     }
-  }
-
-  // TODO: Move to the Projectile class
-  public updateProjectiles(): void {
-    this.projectiles.forEach((p, i) => {
-      p.x += p.directionX * p.speed
-      p.y += p.directionY * p.speed
-      if (
-        p.x < 0 || p.x > CONFIG.CANVAS_WIDTH ||
-        p.y < 0 || p.y > CONFIG.CANVAS_HEIGHT
-      )
-      {
-        this.projectiles.splice(i, 1) // Remove the projectile
-      }
-    })
   }
   
   public draw(): void {
