@@ -2,6 +2,7 @@ import * as CONFIG from '@app/configuration/config.json'
 import Canvas from '@app/infrastructure/Canvas'
 
 import Projectile from '@app/domain/Projectile'
+import { gameObjects } from '@app/domain/Map'
 
 import SoundFX from '@app/audio/SoundFX'
 
@@ -53,10 +54,61 @@ export default class Player {
     if (this.moving.down) {
       this.y += this.maxSpeed
     }
+    this.adjustCollisionWithGameObjects()
     this.updateMapPosition()
   }
 
-  // TODO: Do we need this?
+  // TODO: Generalize collision physics
+  private adjustCollisionWithGameObjects(): void {
+    let o
+    if (gameObjects[this.row]) {
+      if (o = gameObjects[this.row][this.col - 1]) { // West
+        if (this.x <= o.mapX + o.width) {
+          this.x = o.mapX + o.width + 1
+        }
+      }
+      if (o = gameObjects[this.row][this.col + 1]) { // East
+        if (this.x >= o.mapX) {
+          this.x = o.mapX - 1
+        }
+      }
+    }
+    if (gameObjects[this.row - 1]) {
+      if (o = gameObjects[this.row - 1][this.col]) { // North
+        if (this.y <= o.mapY + o.height) {
+          this.y = o.mapY + o.height + 1
+        }
+      }
+      if (o = gameObjects[this.row - 1][this.col + 1]) { // North East
+        if (this.y <= o.mapY + o.height && this.x >= o.mapX) {
+          this.y = o.mapY + o.height + 1
+        }
+      }
+      if (o = gameObjects[this.row - 1][this.col - 1]) { // North West
+        if (this.y <= o.mapY + o.height && this.x <= o.mapX + o.width) {
+          this.y = o.mapY + o.height + 1
+        }
+      }
+    }
+    if (gameObjects[this.row + 1]) {
+      if (o = gameObjects[this.row + 1][this.col]) { // South
+        if (this.y >= o.mapY) {
+          this.y = o.mapY - 1
+        }
+      }
+      if (o = gameObjects[this.row + 1][this.col + 1]) { // South East
+        if (this.x >= o.mapX && this.y >= o.mapY) {
+          this.y = o.mapY - 1
+        }
+      }
+      if (o = gameObjects[this.row + 1][this.col - 1]) { // South West
+        if (this.x <= o.mapX + o.width && this.y >= o.mapY) {
+          this.y = o.mapY - 1
+        }
+      }
+    }
+  }
+
   private updateMapPosition(): void {
     this.row = Math.floor(this.y / CONFIG.TILE_SIZE)
     this.col = Math.floor(this.x / CONFIG.TILE_SIZE)

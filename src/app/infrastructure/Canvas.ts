@@ -109,7 +109,7 @@ export default class Canvas {
     const canvasMouseX: number = Canvas.getCanvasMouseX()
     const canvasMouseY: number = Canvas.getCanvasMouseY()
     context.strokeStyle = '#FF4444'
-    context.lineWidth = 0.2
+    context.lineWidth = 0.1
     context.beginPath()
       context.moveTo(this.center.x, this.center.y)
       context.lineTo(canvasMouseX, canvasMouseY)
