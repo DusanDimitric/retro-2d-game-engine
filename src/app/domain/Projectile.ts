@@ -1,4 +1,5 @@
 import * as CONFIG from '@app/configuration/config.json'
+import Canvas from '@app/infrastructure/Canvas'
 import { gameObjects } from '@app/domain/Map'
 
 export default class Projectile {
@@ -14,12 +15,12 @@ export default class Projectile {
     this.alive = true
   }
 
-  public update(): void {
+  public update(playerX: number, playerY: number): void {
     this.x += this.directionX * this.speed
     this.y += this.directionY * this.speed
     if (
-      this.x < 0 || this.x > CONFIG.CANVAS_WIDTH ||
-      this.y < 0 || this.y > CONFIG.CANVAS_HEIGHT
+      this.x < playerX - Canvas.center.x || this.x > playerX + Canvas.center.x ||
+      this.y < playerY - Canvas.center.y || this.y > playerY + Canvas.center.y
     )
     {
       this.alive = false
@@ -31,8 +32,8 @@ export default class Projectile {
         o = gameObjects[row][col]
         if (o) {
           if (
-            this.x >= o.x && this.x <= o.x + o.width &&
-            this.y >= o.y && this.y <= o.y + o.height
+            this.x >= o.mapX && this.x <= o.mapX + o.width &&
+            this.y >= o.mapY && this.y <= o.mapY + o.height
           )
           {
             this.alive = false

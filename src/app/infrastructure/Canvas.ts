@@ -116,12 +116,18 @@ export default class Canvas {
     context.stroke()
   }
 
-  public static drawProjectiles (projectiles: Projectile[]) {
+  public static drawProjectiles (projectiles: Projectile[], playerX: number, playerY: number) {
     context.fillStyle = '#FFFFFF'
     context.lineWidth = 1
     projectiles.forEach(p => {
       context.beginPath()
-      context.arc(p.x, p.y, 2, 0, (2 * Math.PI))
+      context.arc(
+        p.x + this.center.x - playerX,
+        p.y + this.center.y - playerY,
+        2,
+        0,
+        (2 * Math.PI)
+      )
       context.stroke()
     })
   }

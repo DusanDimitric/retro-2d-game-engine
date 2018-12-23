@@ -33,7 +33,7 @@ export default class Player {
     this.move()
     this.shoot()
     this.projectiles.forEach((p, i) => {
-      p.update()
+      p.update(this.x, this.y)
       if (p.alive === false) {
         this.projectiles.splice(i, 1) // Remove the projectile
       }
@@ -79,7 +79,7 @@ export default class Player {
       xVel += randomFactorX
       yVel += randomFactorY
 
-      this.projectiles.push(new Projectile(Canvas.center.x, Canvas.center.y, xVel, yVel))
+      this.projectiles.push(new Projectile(this.x, this.y, xVel, yVel))
       this.shootingCooldown = 6
 
       SoundFX.playSMG()
@@ -92,7 +92,7 @@ export default class Player {
     Canvas.drawPlayer(this)
 		Canvas.drawPlayerVisionRay(this)
 		Canvas.drawCrosshair()
-		Canvas.drawProjectiles(this.projectiles)
+		Canvas.drawProjectiles(this.projectiles, this.x, this.y)
   }
 
   public setShooting(isShooting: boolean): void {
