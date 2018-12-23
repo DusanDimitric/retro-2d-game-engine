@@ -53,15 +53,15 @@ export default class Canvas {
       context.fillStyle = '#00AA00'
       context.font = "10px Monospace"
 
-      context.fillText(`p (${p.x}, ${p.y})`, 50, 50)
+      context.fillText(`p (${p.x}, ${p.y})`, 10, 20)
       const canvasX: number = Mouse.x - canvas.offsetLeft
       const canvasY: number = Mouse.y - canvas.offsetTop
-      context.fillText(`m (${canvasX}, ${canvasY})`, 50, 62)
+      context.fillText(`m (${canvasX}, ${canvasY})`, 10, 32)
       const dx = canvasX - this.center.x
       const dy = canvasY - this.center.y
-      context.fillText(`d (${dx}, ${dy})`, 50, 74)
+      context.fillText(`d (${dx}, ${dy})`, 10, 44)
       const theta = Math.atan2((dy), (dx))
-      context.fillText(`θ = ${theta}`, 50, 86)
+      context.fillText(`θ = ${theta}`, 10, 56)
 
       context.strokeStyle = '#523DA5'
       context.lineWidth = 2
