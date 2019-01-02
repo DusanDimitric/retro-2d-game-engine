@@ -54,8 +54,8 @@ export default class Canvas {
       context.font = "10px Monospace"
 
       context.fillText(`p (${p.x}, ${p.y})`, 10, 20)
-      const canvasX: number = Mouse.x - canvas.offsetLeft
-      const canvasY: number = Mouse.y - canvas.offsetTop
+      const canvasX: number = Canvas.getCanvasMouseX()
+      const canvasY: number = Canvas.getCanvasMouseY()
       context.fillText(`m (${canvasX}, ${canvasY})`, 10, 32)
       const dx = canvasX - this.center.x
       const dy = canvasY - this.center.y
@@ -71,8 +71,8 @@ export default class Canvas {
   }
 
   public static drawCrosshair(): void {
-    const canvasX: number = Mouse.x - canvas.offsetLeft
-    const canvasY: number = Mouse.y - canvas.offsetTop
+    const canvasX: number = Canvas.getCanvasMouseX()
+    const canvasY: number = Canvas.getCanvasMouseY()
     let offsetX, offsetY
     context.strokeStyle = '#FFFFFF'
     context.lineWidth = 0.5
@@ -133,6 +133,7 @@ export default class Canvas {
   }
 
   public static getCanvasDomElement = (): HTMLCanvasElement => canvas
-  public static getCanvasMouseX = (): number => Mouse.x - canvas.offsetLeft + 0.5
-  public static getCanvasMouseY = (): number => Mouse.y - canvas.offsetTop  + 0.5
+  // TODO: Optimize by not calculating this many times
+  public static getCanvasMouseX = (): number => Math.floor((Mouse.x - canvas.offsetLeft) / CONFIG.SCALE)
+  public static getCanvasMouseY = (): number => Math.floor((Mouse.y - canvas.offsetTop ) / CONFIG.SCALE)
 }
