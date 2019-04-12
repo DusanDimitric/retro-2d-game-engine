@@ -17,29 +17,14 @@ export default class Map {
   }
 
   public draw(): void {
-    let offsetLeft = (this.player.x % CONFIG.TILE_SIZE) - Canvas.colRemainder
-    let offsetTop  = (this.player.y % CONFIG.TILE_SIZE) - Canvas.rowRemainder
-
-    // Correct negative offsets
-    // TODO: See if there is a cleaner way to solve this
-    if (this.player.col < 0) {
-      if (offsetLeft === -Canvas.colRemainder) {
-        offsetLeft = -(CONFIG.TILE_SIZE + Canvas.colRemainder)
-      }
-      offsetLeft += CONFIG.TILE_SIZE
-    }
-    if (this.player.row < 0) {
-      if (1 / offsetTop === -Infinity) {
-        offsetTop = -CONFIG.TILE_SIZE
-      }
-      offsetTop += CONFIG.TILE_SIZE
-    }
+    let offsetLeft = this.player.deltas.dxLeft - Canvas.colRemainder
+    let offsetTop  = this.player.deltas.dyTop  - Canvas.rowRemainder
 
     const rowStart = this.player.row - Canvas.halfRows
     const colStart = this.player.col - Canvas.halfCols
     let gameObject
     for (let row = rowStart; row < rowStart + Canvas.rows + 1; ++row) {
-      for (let col = colStart; col < colStart + Canvas.cols + 1; ++col) {
+      for (let col = colStart - 1; col < colStart + Canvas.cols + 1; ++col) {
         if (gameObjects[row] && gameObjects[row][col]) {
           gameObject = gameObjects[row][col]
           gameObject.x = (col - colStart) * CONFIG.TILE_SIZE - offsetLeft
