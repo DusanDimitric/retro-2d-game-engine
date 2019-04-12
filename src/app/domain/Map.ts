@@ -56,13 +56,13 @@ export default class Map {
       for (let col = 0; col < map[row].length; ++col) {
         switch (map[row][col]) {
           case 1:
-            gameObjects[row][col] = BoxFactory.createBox('#572F17', row, col)
+            gameObjects[row][col] = BoxFactory.createBox('#4B4B4B', row, col, false)
             break
           case 2:
-            gameObjects[row][col] = BoxFactory.createBox('#403550', row, col)
+            gameObjects[row][col] = BoxFactory.createBox('#27531B', row, col)
             break
           case 3:
-            gameObjects[row][col] = BoxFactory.createBox('#27531B', row, col)
+            gameObjects[row][col] = BoxFactory.createBox('#572F17', row, col)
             break
           default:
             gameObjects[row][col] = null

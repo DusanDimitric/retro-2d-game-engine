@@ -12,6 +12,7 @@ export default abstract class GameObject {
     public col: number,
     public width: number,
     public height: number,
+    public destructable: boolean = true,
   ) {
     this.mapX = col * CONFIG.TILE_SIZE
     this.mapY = row * CONFIG.TILE_SIZE

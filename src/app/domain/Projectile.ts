@@ -37,7 +37,9 @@ export default class Projectile {
           )
           {
             this.alive = false
-            gameObjects[row][col] = null
+            if (gameObjects[row][col].destructable) {
+              gameObjects[row][col] = null
+            }
           }
         }
       }
