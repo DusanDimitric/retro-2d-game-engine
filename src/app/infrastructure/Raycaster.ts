@@ -27,17 +27,6 @@ export default class Raycaster {
       else if (xInt < 0) { // South West
         return Raycaster.getInterceptPointSW(p, theta)
       }
-      return {hitPoint: null, hitObject: null}
-
-      // TODO: Delete this
-      // else { // South
-      //   context.arc(
-      //     this.center.x + xInt,
-      //     this.center.y + yInt,
-      //     2, 0, (2 * Math.PI)
-      //   )
-      // }
-
     } else { // North
       return {hitPoint: null, hitObject: null}
       // const yInt = dyTop
@@ -107,7 +96,7 @@ export default class Raycaster {
         context.stroke()
       }
 
-      objectHitVertical = Raycaster.checkGameObjectCollisionVertical(i, p, yIntercept)
+      objectHitVertical = Raycaster.checkGameObjectCollisionVerticalSE(i, p, yIntercept)
 
       if (objectHitVertical) {
         hitPointVertical = { x: tileStepX + p.deltas.dxRight, y: yIntercept }
@@ -157,7 +146,7 @@ export default class Raycaster {
         break
       }
 
-      objectHitHorizontal = Raycaster.checkGameObjectCollisionHorizontal(j, p, xIntercept)
+      objectHitHorizontal = Raycaster.checkGameObjectCollisionHorizontalSE(j, p, xIntercept)
 
       if (objectHitHorizontal) {
         hitPointHorizontal = { x: xIntercept, y: tileStepY + p.deltas.dyBottom }
@@ -310,7 +299,7 @@ export default class Raycaster {
       if (objectHitHorizontal) {
         hitPointHorizontal = { x: xIntercept, y: tileStepY + p.deltas.dyBottom }
         // DEBUG: Enable for debugging
-        context.fillText(`hitPointHorz: ${hitPointHorizontal.x}, ${hitPointHorizontal.y}`, 250, 20)
+        // context.fillText(`hitPointHorz: ${hitPointHorizontal.x}, ${hitPointHorizontal.y}`, 250, 20)
         break
       }
       ++j
@@ -367,7 +356,7 @@ export default class Raycaster {
     }
   }
 
-  private static checkGameObjectCollisionVertical(i: number, p: Player, yIntercept: number): GameObject {
+  private static checkGameObjectCollisionVerticalSE(i: number, p: Player, yIntercept: number): GameObject {
     const xTile = 1 + p.col + i
     const yTile = p.row + Math.floor((p.deltas.dyTop + yIntercept) / CONFIG.TILE_SIZE)
 
@@ -382,7 +371,7 @@ export default class Raycaster {
 
     return gameObjectHit
   }
-  private static checkGameObjectCollisionHorizontal(i: number, p: Player, xIntercept: number): GameObject {
+  private static checkGameObjectCollisionHorizontalSE(i: number, p: Player, xIntercept: number): GameObject {
     const xTile = p.col + Math.floor((p.deltas.dxLeft + xIntercept) / CONFIG.TILE_SIZE)
     const yTile = p.row + i + 1
 
