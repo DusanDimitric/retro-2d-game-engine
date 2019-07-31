@@ -75,7 +75,7 @@ export default class Player {
       let xVel = dx / ( Math.abs(dx) + Math.abs(dy) )
       let yVel = dy / ( Math.abs(dx) + Math.abs(dy) )
 
-      // TODO: Insert accuracy skill to reduce bullet motion randomness
+      // TODO: GAME FEATURE: Insert accuracy skill to reduce bullet motion randomness
       // TODO: Fix the problem with different bullet speeds caused by randomness
       const randomFactorX = Math.random() * 0.1 - 0.05
       const randomFactorY = Math.random() * 0.1 - 0.05
