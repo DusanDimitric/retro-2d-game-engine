@@ -6,7 +6,6 @@ import Player from '@app/domain/Player'
 import Canvas from '@app/infrastructure/Canvas'
 import GameObject from '@app/domain/objects/GameObject'
 import GameObjectFactory from '@app/domain/objects/GameObjectFactory'
-import MapLegend from './MapLegend'
 
 import * as Map01 from '@app/resources/maps/Map-01.json'
 
@@ -40,7 +39,7 @@ export default class Map {
     for (let row = 0; row < map.length; ++row) {
       gameObjects[row] = []
       for (let col = 0; col < map[row].length; ++col) {
-        gameObjects[row][col] = GameObjectFactory.createGameObject(row, col, MapLegend[map[row][col]])
+        gameObjects[row][col] = GameObjectFactory.createGameObject(row, col, map[row][col])
       }
     }
   }
