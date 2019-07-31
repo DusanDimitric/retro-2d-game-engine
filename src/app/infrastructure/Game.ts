@@ -5,6 +5,7 @@ import Player from '@app/domain/player/Player'
 import Canvas from '@app/infrastructure/Canvas'
 import Keyboard from '@app/peripherals/Keyboard'
 import Mouse from '@app/peripherals/Mouse'
+import Gamepads from '@app/peripherals/Gamepads'
 
 export default class Game {
   private grid: Grid
@@ -33,6 +34,7 @@ export default class Game {
   }
 
   private update(): void {
+    Gamepads.update(this.player)
     Canvas.update()
     this.player.update()
   }

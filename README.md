@@ -33,3 +33,21 @@ npx tsc -p tsconfig.json
 ### Sound FX
 
 * MP5 SMG 9mm - By GunGuru from http://soundbible.com/2091-MP5-SMG-9mm.html
+
+## Controls
+
+### Keyboard
+
+W, A, S, D - movement
+Mouse/Trackpad - Aiming / Shooting
+
+### Gamepad
+
+**NOTICE:** Keyboard/Mouse will not work while using a Gamepad. Unplug the
+gamepad in order to keep using the Keyboard/Mouse.
+
+Left analog stick - Movement
+Right analog stick - Aiming
+R1 - Shoot
+
+Inspired by [Red Faction 2 controls](https://www.gamesdatabase.org/Media/SYSTEM/Sony_Playstation_2/manual/Formated/Red_Faction_2_-_2002_-_THQ,_Inc..pdf).
