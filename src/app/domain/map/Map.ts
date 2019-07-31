@@ -4,12 +4,13 @@ import Grid from '@app/domain/Grid'
 
 import Player from '@app/domain/Player'
 import Canvas from '@app/infrastructure/Canvas'
-import GameObject from '@app/infrastructure/objects/GameObject'
-import BoxFactory from '@app/domain/factories/BoxFactory'
+import GameObject from '@app/domain/objects/GameObject'
+import GameObjectFactory from '@app/domain/objects/GameObjectFactory'
+import MapLegend from './MapLegend'
 
 import * as Map01 from '@app/resources/maps/Map-01.json'
 
-export const gameObjects: Array<GameObject[]> = []
+export const gameObjects: GameObject[][] = []
 
 export default class Map {
   constructor(private grid: Grid, private player: Player) {
@@ -17,8 +18,8 @@ export default class Map {
   }
 
   public draw(): void {
-    let offsetLeft = this.player.deltas.dxLeft - Canvas.colRemainder
-    let offsetTop  = this.player.deltas.dyTop  - Canvas.rowRemainder
+    const offsetLeft = this.player.deltas.dxLeft - Canvas.colRemainder
+    const offsetTop  = this.player.deltas.dyTop  - Canvas.rowRemainder
 
     const rowStart = this.player.row - Canvas.halfRows
     const colStart = this.player.col - Canvas.halfCols
@@ -39,19 +40,7 @@ export default class Map {
     for (let row = 0; row < map.length; ++row) {
       gameObjects[row] = []
       for (let col = 0; col < map[row].length; ++col) {
-        switch (map[row][col]) {
-          case 1:
-            gameObjects[row][col] = BoxFactory.createBox('#4B4B4B', row, col, false)
-            break
-          case 2:
-            gameObjects[row][col] = BoxFactory.createBox('#27531B', row, col)
-            break
-          case 3:
-            gameObjects[row][col] = BoxFactory.createBox('#572F17', row, col)
-            break
-          default:
-            gameObjects[row][col] = null
-        }
+        gameObjects[row][col] = GameObjectFactory.createGameObject(row, col, MapLegend[map[row][col]])
       }
     }
   }

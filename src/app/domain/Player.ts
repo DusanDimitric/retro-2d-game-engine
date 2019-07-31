@@ -2,7 +2,7 @@ import * as CONFIG from '@app/configuration/config.json'
 import Canvas from '@app/infrastructure/Canvas'
 
 import Projectile from '@app/domain/Projectile'
-import { gameObjects } from '@app/domain/Map'
+import { gameObjects } from '@app/domain/map/Map'
 
 import SoundFX from '@app/audio/SoundFX'
 

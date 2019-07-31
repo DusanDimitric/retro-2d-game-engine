@@ -4,7 +4,7 @@ import Player from '@app/domain/Player'
 import Projectile from '@app/domain/Projectile'
 import Raycaster from '@app/infrastructure/Raycaster'
 import Mouse from '@app/peripherals/Mouse'
-import Box from './objects/primitives/Box'
+import Box from '../domain/objects/box/Box'
 import Point from './geometry/Point'
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement

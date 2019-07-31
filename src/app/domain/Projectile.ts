@@ -1,6 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 import Canvas from '@app/infrastructure/Canvas'
-import { gameObjects } from '@app/domain/Map'
+import { gameObjects } from '@app/domain/map/Map'
 
 export default class Projectile {
   public speed: number = 24

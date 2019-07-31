@@ -7,11 +7,11 @@ export default abstract class GameObject {
   public mapY: number
 
   constructor(
-    public color: string,
     public row: number,
     public col: number,
     public width: number,
     public height: number,
+    public color: string,
     public destructable: boolean = true,
   ) {
     this.mapX = col * CONFIG.TILE_SIZE

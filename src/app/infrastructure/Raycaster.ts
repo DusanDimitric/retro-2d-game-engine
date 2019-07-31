@@ -2,8 +2,8 @@ import * as CONFIG from '@app/configuration/config.json'
 
 import Point from '@app/infrastructure/geometry/Point'
 import Player from '@app/domain/Player'
-import GameObject from '@app/infrastructure/objects/GameObject'
-import { gameObjects } from '@app/domain/Map'
+import GameObject from '@app/domain/objects/GameObject'
+import { gameObjects } from '@app/domain/map/Map'
 
 // DEBUG: context - only for debugging
 import Canvas, { context } from '@app/infrastructure/Canvas'

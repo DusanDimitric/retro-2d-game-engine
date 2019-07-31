@@ -1,23 +1,27 @@
-import Canvas from '@app/infrastructure/Canvas'
-import Mouse from '@app/peripherals/Mouse'
-import Keyboard from '@app/peripherals/Keyboard'
-import Grid from '@app/domain/Grid'
-import Map from '@app/domain/Map'
-import Player from '@app/domain/Player'
 import AudioLoader from '@app/audio/AudioLoader'
-
-// Load all assets
-AudioLoader.load()
-
-// Initialize the game
-const grid: Grid = new Grid()
-const player: Player = new Player(128, 64)
-const map: Map = new Map(grid, player)
-
-Keyboard.init(player)
-Mouse.init(player)
+import Grid from '@app/domain/Grid'
+import Map from '@app/domain/map/Map'
+import Player from '@app/domain/Player'
+import Canvas from '@app/infrastructure/Canvas'
+import Keyboard from '@app/peripherals/Keyboard'
+import Mouse from '@app/peripherals/Mouse'
 
 export default class Game {
+  private grid: Grid
+  private player: Player
+  private map: Map
+
+  constructor() {
+    AudioLoader.load()
+
+    this.grid = new Grid()
+    this.player = new Player(128, 64)
+    this.map = new Map(this.grid, this.player)
+
+    Keyboard.init(this.player)
+    Mouse.init(this.player)
+  }
+
   public start(): void {
     window.requestAnimationFrame(() => this.gameLoop())
   }
@@ -29,12 +33,12 @@ export default class Game {
   }
 
   private update(): void {
-    player.update()
+    this.player.update()
   }
 
   private render(): void {
     Canvas.clear()
-    map.draw()
-    player.draw()
+    this.map.draw()
+    this.player.draw()
   }
 }
