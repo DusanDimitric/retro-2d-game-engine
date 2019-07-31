@@ -1,5 +1,8 @@
 import * as CONFIG from '@app/configuration/config.json'
-import Canvas from '@app/infrastructure/Canvas'
+import Canvas, { context } from '@app/infrastructure/Canvas'
+import Point from '@app/infrastructure/geometry/Point'
+import Raycaster from '@app/infrastructure/Raycaster'
+import Crosshair from './Crosshair'
 
 import Projectile from '@app/domain/Projectile'
 import { gameObjects } from '@app/domain/map/Map'
@@ -91,37 +94,76 @@ export default class Player {
     }
   }
 
-  public draw(): void {
-    const theta = Canvas.calculateTheta(this)
-    Canvas.drawPlayer(this, theta)
-    Canvas.drawPlayerVisionRay(this, theta)
-
-    // TODO: Just for testing purposes. Delete this.
-    // Canvas.drawPlayerVisionRay(this, theta - 0.45)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.4)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.35)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.3)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.25)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.2)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.15)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.1)
-    // Canvas.drawPlayerVisionRay(this, theta - 0.05)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.05)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.1)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.15)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.2)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.25)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.3)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.35)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.4)
-    // Canvas.drawPlayerVisionRay(this, theta + 0.45)
-
-    Canvas.drawCrosshair()
-    Canvas.drawProjectiles(this.projectiles, this.x, this.y)
-  }
-
   public setShooting(isShooting: boolean): void {
     this.shooting = isShooting
+  }
+
+  public draw(): void {
+    const theta = this.calculateTheta()
+    this.drawPlayer(theta)
+    this.drawPlayerVisionRay(theta)
+
+    // TODO: Just for testing purposes. Delete this.
+    // this.drawPlayerVisionRay(theta - 0.45)
+    // this.drawPlayerVisionRay(theta - 0.4)
+    // this.drawPlayerVisionRay(theta - 0.35)
+    // this.drawPlayerVisionRay(theta - 0.3)
+    // this.drawPlayerVisionRay(theta - 0.25)
+    // this.drawPlayerVisionRay(theta - 0.2)
+    // this.drawPlayerVisionRay(theta - 0.15)
+    // this.drawPlayerVisionRay(theta - 0.1)
+    // this.drawPlayerVisionRay(theta - 0.05)
+    // this.drawPlayerVisionRay(theta + 0.05)
+    // this.drawPlayerVisionRay(theta + 0.1)
+    // this.drawPlayerVisionRay(theta + 0.15)
+    // this.drawPlayerVisionRay(theta + 0.2)
+    // this.drawPlayerVisionRay(theta + 0.25)
+    // this.drawPlayerVisionRay(theta + 0.3)
+    // this.drawPlayerVisionRay(theta + 0.35)
+    // this.drawPlayerVisionRay(theta + 0.4)
+    // this.drawPlayerVisionRay(theta + 0.45)
+
+    Crosshair.draw()
+    this.drawProjectiles()
+  }
+
+  private calculateTheta(): number {
+    const theta = Math.atan2(
+      (Canvas.getCanvasMouseY() - Canvas.center.y),
+      (Canvas.getCanvasMouseX() - Canvas.center.x)
+    )
+    context.fillStyle = '#44FF44'
+    context.fillText(`θ = ${theta}`, 10, 56)
+    return theta
+  }
+
+  private drawPlayer(theta: number): void {
+    context.beginPath()
+      context.fillStyle = '#00AA00'
+      context.font = "10px Monospace"
+
+      context.fillText(`p (${this.x}, ${this.y})`, 10, 20)
+
+      context.strokeStyle = '#523DA5'
+      context.lineWidth = 2
+      context.moveTo(Canvas.center.x, Canvas.center.y)
+      context.lineTo(Canvas.center.x + (this.sightLineLength * Math.cos(theta)), Canvas.center.y + (this.sightLineLength * Math.sin(theta)))
+    context.stroke()
+  }
+
+  private drawPlayerVisionRay(theta: number) {
+    const { hitPoint, hitObject } = Raycaster.cast(this, theta)
+    if (hitPoint) {
+      if (hitObject) {
+        Raycaster.drawRay(hitPoint, '#FF4444')
+      } else {
+        Raycaster.drawRay(hitPoint)
+      }
+    }
+  }
+
+  private drawProjectiles() {
+    this.projectiles.forEach(p => p.draw(this.x, this.y))
   }
 
   private updateMapPosition(): void {

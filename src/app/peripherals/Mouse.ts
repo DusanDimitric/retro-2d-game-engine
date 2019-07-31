@@ -1,5 +1,5 @@
 import Canvas from '@app/infrastructure/Canvas'
-import Player from '@app/domain/Player'
+import Player from '@app/domain/player/Player'
 
 export default class Mouse {
   public static x: number = 0

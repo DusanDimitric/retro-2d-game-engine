@@ -1,11 +1,10 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import Point from '@app/infrastructure/geometry/Point'
-import Player from '@app/domain/Player'
+import Player from '@app/domain/player/Player'
 import GameObject from '@app/domain/objects/GameObject'
 import { gameObjects } from '@app/domain/map/Map'
 
-// DEBUG: context - only for debugging
 import Canvas, { context } from '@app/infrastructure/Canvas'
 
 export default class Raycaster {
@@ -41,6 +40,19 @@ export default class Raycaster {
         return Raycaster.getInterceptPointNW(p, theta)
       }
     }
+  }
+
+  public static drawRay(hitPoint: Point, color: string = '#4444FF'): void {
+    context.strokeStyle = color
+    context.lineWidth = 0.5
+    context.beginPath()
+      context.moveTo(Canvas.center.x, Canvas.center.y)
+      context.lineTo(
+        Canvas.center.x + hitPoint.x,
+        Canvas.center.y + hitPoint.y
+      )
+    context.stroke()
+    context.lineWidth = 1
   }
 
   // TODO: This is a naive implementation! Add 6x optimization
@@ -470,7 +482,6 @@ export default class Raycaster {
       }
     }
   }
-
 
   // TODO: This is a naive implementation! Add 6x optimization
   private static getInterceptPointSW(p: Player, theta: number): { hitPoint: Point, hitObject: GameObject } {

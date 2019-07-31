@@ -1,4 +1,4 @@
-import Player from '@app/domain/Player'
+import Player from '@app/domain/player/Player'
 import { KEYBOARD_KEYS } from './constants/KeyCodes'
 
 export default class Keyboard {

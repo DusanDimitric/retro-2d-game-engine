@@ -1,5 +1,5 @@
 import * as CONFIG from '@app/configuration/config.json'
-import Canvas from '@app/infrastructure/Canvas'
+import Canvas, { context } from '@app/infrastructure/Canvas'
 import { gameObjects } from '@app/domain/map/Map'
 
 export default class Projectile {
@@ -20,6 +20,20 @@ export default class Projectile {
     }
 
     this.checkCollisionWithGameObject()
+  }
+
+  public draw(playerX: number, playerY: number) {
+    context.fillStyle = '#FFFFFF'
+    context.lineWidth = 1
+    context.beginPath()
+    context.arc(
+      this.x + Canvas.center.x - playerX,
+      this.y + Canvas.center.y - playerY,
+      2,
+      0,
+      (2 * Math.PI)
+    )
+    context.stroke()
   }
 
   private isOffScreen(playerX: number, playerY: number): boolean {

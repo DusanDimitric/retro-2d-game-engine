@@ -2,7 +2,7 @@ import * as CONFIG from '@app/configuration/config.json'
 
 import Grid from '@app/domain/Grid'
 
-import Player from '@app/domain/Player'
+import Player from '@app/domain/player/Player'
 import Canvas from '@app/infrastructure/Canvas'
 import GameObject from '@app/domain/objects/GameObject'
 import GameObjectFactory from '@app/domain/objects/GameObjectFactory'
