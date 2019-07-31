@@ -70,8 +70,8 @@ export default class Player {
 
   public shoot(): void {
     if (this.shooting && this.shootingCooldown <= 0) {
-      const canvasMouseX: number = Canvas.getCanvasMouseX()
-      const canvasMouseY: number = Canvas.getCanvasMouseY()
+      const canvasMouseX: number = Canvas.canvasMouseX
+      const canvasMouseY: number = Canvas.canvasMouseY
 
       const dx = (canvasMouseX - Canvas.center.x)
       const dy = (canvasMouseY - Canvas.center.y)
@@ -129,8 +129,8 @@ export default class Player {
 
   private calculateTheta(): number {
     const theta = Math.atan2(
-      (Canvas.getCanvasMouseY() - Canvas.center.y),
-      (Canvas.getCanvasMouseX() - Canvas.center.x)
+      (Canvas.canvasMouseY - Canvas.center.y),
+      (Canvas.canvasMouseX - Canvas.center.x)
     )
     context.fillStyle = '#44FF44'
     context.fillText(`θ = ${theta}`, 10, 56)

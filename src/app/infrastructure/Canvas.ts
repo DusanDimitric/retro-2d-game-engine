@@ -16,6 +16,8 @@ export default class Canvas {
   public static halfCols = Math.floor((canvas.width  / 2) / CONFIG.TILE_SIZE)
   public static rowRemainder = (canvas.height / 2) % CONFIG.TILE_SIZE
   public static colRemainder = (canvas.width  / 2) % CONFIG.TILE_SIZE
+  public static canvasMouseX: number
+  public static canvasMouseY: number
 
   public static center: { x: number, y: number } = {
     x: CONFIG.CANVAS_WIDTH  / 2,
@@ -27,7 +29,9 @@ export default class Canvas {
   }
 
   public static getCanvasDomElement = (): HTMLCanvasElement => canvas
-  // TODO: Optimize by not calculating this many times
-  public static getCanvasMouseX = (): number => Math.floor((Mouse.x - canvas.offsetLeft) / CONFIG.SCALE)
-  public static getCanvasMouseY = (): number => Math.floor((Mouse.y - canvas.offsetTop ) / CONFIG.SCALE)
+
+  public static update() {
+    this.canvasMouseX = Math.floor((Mouse.x - canvas.offsetLeft) / CONFIG.SCALE)
+    this.canvasMouseY = Math.floor((Mouse.y - canvas.offsetTop ) / CONFIG.SCALE)
+  }
 }

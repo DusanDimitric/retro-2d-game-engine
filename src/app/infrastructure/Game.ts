@@ -33,6 +33,7 @@ export default class Game {
   }
 
   private update(): void {
+    Canvas.update()
     this.player.update()
   }
 
