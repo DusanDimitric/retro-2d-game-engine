@@ -2,8 +2,8 @@ import Canvas from '@app/infrastructure/Canvas'
 import Player from '@app/domain/player/Player'
 
 export default class Mouse {
-  public static x: number = 0
-  public static y: number = 0
+  public static x: number = window.innerWidth  / 2 + 100
+  public static y: number = window.innerHeight / 2 + 50
   public static init(player: Player) {
     this.hijackRightClick()
     this.trackMouseOnCanvas()
