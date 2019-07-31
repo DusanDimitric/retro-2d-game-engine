@@ -19,21 +19,21 @@ Mouse.init(player)
 
 export default class Game {
   public start(): void {
-		window.requestAnimationFrame(() => this.gameLoop())
+    window.requestAnimationFrame(() => this.gameLoop())
   }
 
-	private gameLoop(): void {
-		this.update()
-		this.render()
-		window.requestAnimationFrame(() => this.gameLoop())
-	}
+  private gameLoop(): void {
+    this.update()
+    this.render()
+    window.requestAnimationFrame(() => this.gameLoop())
+  }
 
   private update(): void {
     player.update()
   }
 
   private render(): void {
-	  Canvas.clear()
+    Canvas.clear()
     map.draw()
     player.draw()
   }
