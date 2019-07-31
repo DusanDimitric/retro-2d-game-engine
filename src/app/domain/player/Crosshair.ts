@@ -2,8 +2,8 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 
 export default class Crosshair {
   public static draw(): void {
-    const canvasX: number = Canvas.canvasMouseX
-    const canvasY: number = Canvas.canvasMouseY
+    const canvasX: number = Canvas.mousePosition.x
+    const canvasY: number = Canvas.mousePosition.y
     let offsetX
     let offsetY
     context.strokeStyle = '#FFFFFF'

@@ -36,7 +36,7 @@ export default class Raycaster {
       if (xInt >= 0 && xIntIsPositive) { // North East
         return Raycaster.getInterceptPointNE(p, theta)
       }
-      else {
+      else { // North West
         return Raycaster.getInterceptPointNW(p, theta)
       }
     }

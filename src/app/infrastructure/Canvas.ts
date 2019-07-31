@@ -1,5 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 
+import Point from '@app/infrastructure/geometry/Point'
 import Mouse from '@app/peripherals/Mouse'
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
@@ -16,10 +17,9 @@ export default class Canvas {
   public static halfCols = Math.floor((canvas.width  / 2) / CONFIG.TILE_SIZE)
   public static rowRemainder = (canvas.height / 2) % CONFIG.TILE_SIZE
   public static colRemainder = (canvas.width  / 2) % CONFIG.TILE_SIZE
-  public static canvasMouseX: number
-  public static canvasMouseY: number
+  public static mousePosition: Point
 
-  public static center: { x: number, y: number } = {
+  public static center: Point = {
     x: CONFIG.CANVAS_WIDTH  / 2,
     y: CONFIG.CANVAS_HEIGHT / 2,
   }
@@ -31,7 +31,9 @@ export default class Canvas {
   public static getCanvasDomElement = (): HTMLCanvasElement => canvas
 
   public static update() {
-    this.canvasMouseX = Math.floor((Mouse.x - canvas.offsetLeft) / CONFIG.SCALE)
-    this.canvasMouseY = Math.floor((Mouse.y - canvas.offsetTop ) / CONFIG.SCALE)
+    this.mousePosition = {
+      x: Math.floor((Mouse.x - canvas.offsetLeft) / CONFIG.SCALE),
+      y: Math.floor((Mouse.y - canvas.offsetTop ) / CONFIG.SCALE)
+    }
   }
 }
