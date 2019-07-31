@@ -4,7 +4,6 @@ import Player from '@app/domain/Player'
 import Projectile from '@app/domain/Projectile'
 import Raycaster from '@app/infrastructure/Raycaster'
 import Mouse from '@app/peripherals/Mouse'
-import Box from '../domain/objects/box/Box'
 import Point from './geometry/Point'
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
@@ -29,26 +28,6 @@ export default class Canvas {
 
   public static clear(): void {
     context.clearRect(0, 0, canvas.width, canvas.height)
-  }
-
-  // TODO: Move to Box.draw()
-  public static drawBox(box: Box): void {
-    context.strokeStyle = box.color
-    context.lineWidth = 1
-    context.beginPath()
-      // Draw box outline
-      context.moveTo( 0.5 + box.x,                     0.5 + box.y)
-      context.lineTo(-0.5 + box.x + CONFIG.TILE_SIZE,  0.5 + box.y)
-      context.lineTo(-0.5 + box.x + CONFIG.TILE_SIZE, -0.5 + box.y + CONFIG.TILE_SIZE)
-      context.lineTo( 0.5 + box.x                   , -0.5 + box.y + CONFIG.TILE_SIZE)
-      context.lineTo( 0.5 + box.x,                     0.5 + box.y)
-
-      // Draw 'x' accross the box
-      context.moveTo( 0.5 + box.x,                     0.5 + box.y)
-      context.lineTo(-0.5 + box.x + CONFIG.TILE_SIZE, -0.5 + box.y + CONFIG.TILE_SIZE)
-      context.moveTo(-0.5 + box.x + CONFIG.TILE_SIZE,  0.5 + box.y)
-      context.lineTo( 0.5 + box.x,                    -0.5 + box.y + CONFIG.TILE_SIZE)
-    context.stroke()
   }
 
   public static calculateTheta(p: Player): number {
