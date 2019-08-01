@@ -134,6 +134,7 @@ export default class Player {
   }
 
   private drawPlayer(theta: number): void {
+    // Draw gun
     context.beginPath()
       context.fillStyle = '#00AA00'
       context.font = "10px Monospace"
@@ -144,6 +145,18 @@ export default class Player {
       context.lineWidth = 2
       context.moveTo(Canvas.center.x, Canvas.center.y)
       context.lineTo(Canvas.center.x + (this.sightLineLength * Math.cos(theta)), Canvas.center.y + (this.sightLineLength * Math.sin(theta)))
+    context.stroke()
+
+    // Draw circle around player
+    context.beginPath()
+      context.lineWidth = 1
+      context.arc(
+        Canvas.center.x,
+        Canvas.center.y,
+        10,
+        0,
+        (2 * Math.PI)
+      )
     context.stroke()
   }
 
