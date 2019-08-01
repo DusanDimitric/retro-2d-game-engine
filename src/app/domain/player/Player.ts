@@ -1,11 +1,10 @@
 import * as CONFIG from '@app/configuration/config.json'
 import Canvas, { context } from '@app/infrastructure/Canvas'
-import Point from '@app/infrastructure/geometry/Point'
 import Raycaster from '@app/infrastructure/Raycaster'
-import Crosshair from './Crosshair'
 
-import Projectile from '@app/domain/Projectile'
 import { gameObjects } from '@app/domain/map/Map'
+import Crosshair from './Crosshair'
+import Projectile from './Projectile'
 
 import SoundFX from '@app/audio/SoundFX'
 
