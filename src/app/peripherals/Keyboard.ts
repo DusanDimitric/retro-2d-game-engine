@@ -1,3 +1,4 @@
+import Game from '@app/infrastructure/Game'
 import Player from '@app/domain/player/Player'
 import { KEYBOARD_KEYS } from './constants/KeyCodes'
 
@@ -17,6 +18,9 @@ export default class Keyboard {
           break
         case KEYBOARD_KEYS.d:
           player.moving.right = true
+          break
+        case KEYBOARD_KEYS.p: // Pause, only for debugging
+          Game.paused = !Game.paused
           break
         default:
           break

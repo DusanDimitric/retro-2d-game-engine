@@ -8,6 +8,8 @@ import Mouse from '@app/peripherals/Mouse'
 import Gamepads from '@app/peripherals/Gamepads'
 
 export default class Game {
+  public static paused: boolean = false
+
   private grid: Grid
   private player: Player
   private map: Map
@@ -28,8 +30,10 @@ export default class Game {
   }
 
   private gameLoop(): void {
-    this.update()
-    this.render()
+    if (Game.paused === false) {
+      this.update()
+      this.render()
+    }
     window.requestAnimationFrame(() => this.gameLoop())
   }
 
