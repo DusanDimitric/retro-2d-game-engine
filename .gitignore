@@ -1,6 +1,9 @@
 # Build artifacts
 build/
 
+# Architecture visualization output
+arkit.svg
+
 # Dependency directory
 node_modules/
 

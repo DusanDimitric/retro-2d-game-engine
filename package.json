@@ -7,11 +7,13 @@
     "lint": "tslint ./src/**/*.ts",
     "build": "webpack",
     "start": "npm run build -- -w --mode production",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "visualize-architecture": "arkit src/ -o arkit.svg"
   },
   "author": "Dušan Dimitrić <dusan_dimitric@yahoo.com",
   "license": "ISC",
   "devDependencies": {
+    "arkit": "^1.6.2",
     "source-map-support": "^0.5.9",
     "ts-loader": "^5.3.0",
     "tslint": "^5.11.0",
