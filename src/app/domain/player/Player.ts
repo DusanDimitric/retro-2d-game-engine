@@ -1,6 +1,7 @@
 import * as CONFIG from '@app/configuration/config.json'
 import Canvas, { context } from '@app/infrastructure/Canvas'
 import Raycaster from '@app/infrastructure/Raycaster'
+import CollisionBox from '@app/infrastructure/CollisionBox'
 
 import { gameObjects } from '@app/domain/map/Map'
 import Crosshair from './Crosshair'
@@ -25,7 +26,8 @@ export default class Player {
     dxLeft   : 0,
     dxRight  : 0,
   }
-  private maxSpeed = 4
+  private collisionBox: CollisionBox = new CollisionBox(12, 12)
+  private maxSpeed = 3
   private shooting = false
   private shootingCooldown = 6
   private projectiles: Projectile[] = []
@@ -147,16 +149,19 @@ export default class Player {
       context.lineTo(Canvas.center.x + (this.sightLineLength * Math.cos(theta)), Canvas.center.y + (this.sightLineLength * Math.sin(theta)))
     context.stroke()
 
-    // Draw circle around player
+    this.drawCollisionBox() // Just for debugging
+  }
+
+  private drawCollisionBox() {
+    context.lineWidth = 1
     context.beginPath()
-      context.lineWidth = 1
-      context.arc(
-        Canvas.center.x,
-        Canvas.center.y,
-        10,
-        0,
-        (2 * Math.PI)
-      )
+      // Since this is just for debugging purposes, there is no need to
+      // cache the vertex calculations.
+      context.moveTo( 0.5 + Canvas.center.x - this.collisionBox.halfWidth,  0.5 + Canvas.center.y - this.collisionBox.halfHeight)
+      context.lineTo(-0.5 + Canvas.center.x + this.collisionBox.halfWidth,  0.5 + Canvas.center.y - this.collisionBox.halfHeight)
+      context.lineTo(-0.5 + Canvas.center.x + this.collisionBox.halfWidth, -0.5 + Canvas.center.y + this.collisionBox.halfHeight)
+      context.lineTo( 0.5 + Canvas.center.x - this.collisionBox.halfWidth, -0.5 + Canvas.center.y + this.collisionBox.halfHeight)
+      context.lineTo( 0.5 + Canvas.center.x - this.collisionBox.halfWidth,  0.5 + Canvas.center.y - this.collisionBox.halfHeight)
     context.stroke()
   }
 
@@ -191,48 +196,112 @@ export default class Player {
   private adjustCollisionWithGameObjects(): void {
     let o
     if (gameObjects[this.row]) {
-      if (o = gameObjects[this.row][this.col - 1]) { // West
-        if (this.x <= o.mapX + o.width) {
-          this.x = o.mapX + o.width + 1
+      if (this.moving.left) {
+        o = gameObjects[this.row][this.col - 1] // West
+        if (o && this.x - this.collisionBox.halfWidth <= o.mapX + o.width) {
+          this.x = o.mapX + o.width + this.collisionBox.halfWidth
+        }
+
+        const SWVertexRow = Math.floor((this.y + this.collisionBox.halfHeight - 1) / CONFIG.TILE_SIZE)
+        if (SWVertexRow !== this.row) { // SW vertex overflows the player grid
+          o = gameObjects[SWVertexRow][this.col - 1] // South West
+          if (o && this.x - this.collisionBox.halfWidth <= o.mapX + o.width) {
+            if (!(this.moving.down && this.deltas.dyTop <= this.deltas.dxRight)) {
+              this.x = o.mapX + o.width + this.collisionBox.halfWidth
+            }
+          }
+        }
+
+        const NWVertexRow = Math.floor((this.y - this.collisionBox.halfHeight) / CONFIG.TILE_SIZE)
+        if (NWVertexRow !== this.row) { // NW vertex overflows the player grid
+          o = gameObjects[NWVertexRow][this.col - 1] // North West
+          if (o && this.x - this.collisionBox.halfWidth <= o.mapX + o.width) {
+            if (!(this.moving.up && this.deltas.dyBottom <= this.deltas.dxRight)) {
+              this.x = o.mapX + o.width + this.collisionBox.halfWidth
+            }
+          }
         }
       }
-      if (o = gameObjects[this.row][this.col + 1]) { // East
-        if (this.x >= o.mapX) {
-          this.x = o.mapX - 1
+      if (this.moving.right) {
+        o = gameObjects[this.row][this.col + 1] // East
+        if (o && this.x + this.collisionBox.halfWidth >= o.mapX) {
+          this.x = o.mapX - this.collisionBox.halfWidth
+        }
+
+        const SEVertexRow = Math.floor((this.y + this.collisionBox.halfHeight - 1) / CONFIG.TILE_SIZE)
+        if (SEVertexRow !== this.row) { // SE vertex overflows the player grid
+          o = gameObjects[SEVertexRow][this.col + 1] // South East
+          if (o && this.x + this.collisionBox.halfWidth >= o.mapX) {
+            if (!(this.moving.down && this.deltas.dyTop <= this.deltas.dxLeft)) {
+              this.x = o.mapX - this.collisionBox.halfWidth
+            }
+          }
+        }
+
+        const NEVertexRow = Math.floor((this.y - this.collisionBox.halfHeight) / CONFIG.TILE_SIZE)
+        if (NEVertexRow !== this.row) { // NE vertex overflows the player grid
+          o = gameObjects[NEVertexRow][this.col + 1] // North East
+          if (o && this.x + this.collisionBox.halfWidth >= o.mapX) {
+            if (!(this.moving.up && this.deltas.dyBottom <= this.deltas.dxLeft)) {
+              this.x = o.mapX - this.collisionBox.halfWidth
+            }
+          }
         }
       }
     }
     if (gameObjects[this.row - 1]) {
-      if (o = gameObjects[this.row - 1][this.col]) { // North
-        if (this.y <= o.mapY + o.height) {
-          this.y = o.mapY + o.height + 1
+      if (this.moving.up) {
+        o = gameObjects[this.row - 1][this.col] // North
+        if (o && this.y - this.collisionBox.halfHeight <= o.mapY + o.height) {
+          this.y = o.mapY + o.height + this.collisionBox.halfHeight
         }
-      }
-      if (o = gameObjects[this.row - 1][this.col + 1]) { // North East
-        if (this.y <= o.mapY + o.height && this.x >= o.mapX) {
-          this.y = o.mapY + o.height + 1
+
+        const NEVertexCol = Math.floor((this.x + this.collisionBox.halfWidth - 1) / CONFIG.TILE_SIZE)
+        if (NEVertexCol !== this.col) { // NE vertex overflows the player grid
+          o = gameObjects[this.row - 1][NEVertexCol] // North East
+          if (o && this.y - this.collisionBox.halfHeight <= o.mapY + o.height) {
+            if (!(this.moving.right && this.deltas.dyBottom > this.deltas.dxLeft)) {
+              this.y = o.mapY + o.height + this.collisionBox.halfHeight
+            }
+          }
         }
-      }
-      if (o = gameObjects[this.row - 1][this.col - 1]) { // North West
-        if (this.y <= o.mapY + o.height && this.x <= o.mapX + o.width) {
-          this.y = o.mapY + o.height + 1
+
+        const NWVertexCol = Math.floor((this.x - this.collisionBox.halfWidth) / CONFIG.TILE_SIZE)
+        if (NWVertexCol !== this.col) { // NW vertex overflows the player grid
+          o = gameObjects[this.row - 1][NWVertexCol] // North West
+          if (o && this.y - this.collisionBox.halfHeight <= o.mapY + o.height) {
+            if (!(this.moving.left && this.deltas.dyBottom > this.deltas.dxRight)) {
+              this.y = o.mapY + o.height + this.collisionBox.halfHeight
+            }
+          }
         }
       }
     }
     if (gameObjects[this.row + 1]) {
-      if (o = gameObjects[this.row + 1][this.col]) { // South
-        if (this.y >= o.mapY) {
-          this.y = o.mapY - 1
+      if (this.moving.down) {
+        o = gameObjects[this.row + 1][this.col] // South
+        if (o && this.y + this.collisionBox.halfHeight >= o.mapY) {
+          this.y = o.mapY - this.collisionBox.halfHeight
         }
       }
-      if (o = gameObjects[this.row + 1][this.col + 1]) { // South East
-        if (this.x >= o.mapX && this.y >= o.mapY) {
-          this.y = o.mapY - 1
+
+      const SEVertexCol = Math.floor((this.x + this.collisionBox.halfWidth - 1) / CONFIG.TILE_SIZE)
+      if (SEVertexCol !== this.col) { // SE vertex overflows the player grid
+        o = gameObjects[this.row + 1][SEVertexCol] // South East
+        if (o && this.y + this.collisionBox.halfHeight >= o.mapY) {
+          if (!(this.moving.right && this.deltas.dyTop > this.deltas.dxLeft)) {
+            this.y = o.mapY - this.collisionBox.halfHeight
+          }
         }
       }
-      if (o = gameObjects[this.row + 1][this.col - 1]) { // South West
-        if (this.x <= o.mapX + o.width && this.y >= o.mapY) {
-          this.y = o.mapY - 1
+
+      const SWVertexCol = Math.floor((this.x - this.collisionBox.halfWidth) / CONFIG.TILE_SIZE)
+      if (SWVertexCol !== this.col) { // SW vertex overflows the player grid
+        o = gameObjects[this.row + 1][SWVertexCol] // South West
+        if (o && this.y + this.collisionBox.halfHeight >= o.mapY) {
+          if (!(this.moving.left && this.deltas.dyTop > this.deltas.dxRight)) {
+            this.y = o.mapY - this.collisionBox.halfHeight
+          }
         }
       }
     }
