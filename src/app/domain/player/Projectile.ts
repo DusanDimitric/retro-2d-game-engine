@@ -114,8 +114,8 @@ export default class Projectile {
 
   private isOffScreen(playerX: number, playerY: number): boolean {
     return (
-      this.x < playerX - Canvas.center.x || this.x > playerX + Canvas.center.x ||
-      this.y < playerY - Canvas.center.y || this.y > playerY + Canvas.center.y
+      this.x < playerX - Canvas.center.x - CONFIG.TILE_SIZE || this.x > playerX + Canvas.center.x + CONFIG.TILE_SIZE ||
+      this.y < playerY - Canvas.center.y - CONFIG.TILE_SIZE || this.y > playerY + Canvas.center.y + CONFIG.TILE_SIZE
     )
   }
 
