@@ -28,7 +28,6 @@ export default class Enemy {
       healthPercentage = 1.0
     }
     this.health = this.maxHealth * healthPercentage
-    console.log(this.health)
 
     this.movementPath = [ // TODO: Delete this temp placeholder, get paths from the Map JSON
       { x: this.x, y: this.y },
