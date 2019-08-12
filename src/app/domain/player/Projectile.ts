@@ -2,7 +2,8 @@ import * as CONFIG from '@app/configuration/config.json'
 
 import Canvas, { context } from '@app/infrastructure/Canvas'
 
-import { gameObjects } from '@app/domain/map/Map'
+import Enemy from '@app/domain/enemies/Enemy'
+import { gameObjects, enemies } from '@app/domain/map/Map'
 
 interface IntermediatePoint {
   x: number
@@ -13,6 +14,7 @@ interface IntermediatePoint {
 
 export default class Projectile {
   public speed: number = 24
+  public damage: number = 10
   public alive: boolean = true
   public row: number
   public col: number
@@ -44,6 +46,8 @@ export default class Projectile {
     this.row = Math.floor(this.y / CONFIG.TILE_SIZE)
     this.col = Math.floor(this.x / CONFIG.TILE_SIZE)
 
+    const nearbyEnemies = this.getNearbyEnemies()
+
     this.calculateIntermediatePoints()
 
     if (this.isOffScreen(playerX, playerY)) {
@@ -52,10 +56,12 @@ export default class Projectile {
 
     this.intermediatePositions.forEach(intermediatePoint => {
       if (this.alive) {
+        this.checkCollisionWithEnemies(nearbyEnemies, intermediatePoint)
         this.checkCollisionWithGameObject(intermediatePoint)
       }
     })
     if (this.alive) {
+      this.checkCollisionWithEnemies(nearbyEnemies)
       this.checkCollisionWithGameObject()
     }
   }
@@ -77,7 +83,15 @@ export default class Projectile {
     )
     context.stroke()
   }
-
+  // TODO: There could be space for optimization here
+  //       Instead of finding the nearest enemies every time, maybe just take
+  //       the enemies that are visible on the screen (+ some offset)?
+  private getNearbyEnemies(): Enemy[] {
+    return [ ...enemies ].filter(e => (
+      Math.abs(e.x - this.x) <= CONFIG.TILE_SIZE &&
+      Math.abs(e.y - this.y) <= CONFIG.TILE_SIZE
+    ))
+  }
   /**
    *                                     (this.x, this.y)
    *  (this.previousX, this.previousY)   /
@@ -105,6 +119,24 @@ export default class Projectile {
     )
   }
 
+  private checkCollisionWithEnemies(nearbyEnemies: Enemy[], point?: IntermediatePoint | Projectile): void {
+    if (!point) {
+      point = this
+    }
+
+    nearbyEnemies.forEach(e => {
+      if (
+        point.x >= e.x - e.collisionBox.halfWidth &&
+        point.x <= e.x + e.collisionBox.halfWidth &&
+        point.y >= e.y - e.collisionBox.halfHeight &&
+        point.y <= e.y + e.collisionBox.halfHeight
+      ) {
+        this.alive = false
+        e.takeDamage(this.getDamage())
+      }
+    })
+  }
+
   private checkCollisionWithGameObject(point?: IntermediatePoint | Projectile): void {
     if (!point) {
       point = this
@@ -112,10 +144,15 @@ export default class Projectile {
 
     const o = gameObjects[point.row][point.col]
     if (o) {
+        o.takeDamage(this.getDamage())
         this.alive = false
         if (o.destructable) {
           gameObjects[point.row][point.col] = null
         }
     }
+  }
+
+  private getDamage(): number {
+    return this.damage // TODO: Randomize this a bit
   }
 }

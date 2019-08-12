@@ -41,6 +41,7 @@ export default class Game {
     Gamepads.update(this.player)
     Canvas.update()
     this.player.update()
+    this.map.update()
   }
 
   private render(): void {
