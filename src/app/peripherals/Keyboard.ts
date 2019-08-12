@@ -1,11 +1,12 @@
 import Game from '@app/infrastructure/Game'
+import FrameRate from '@app/infrastructure/FrameRate'
 import Player from '@app/domain/player/Player'
 import { KEYBOARD_KEYS } from './constants/KeyCodes'
 
 export default class Keyboard {
   public static init(player: Player): void {
-    // TODO: Move Player logic to Player class
     document.addEventListener('keydown', e => {
+      // TODO: Move Player logic to Player class
       switch (e.keyCode) {
         case KEYBOARD_KEYS.w:
           player.moving.up = true
@@ -19,7 +20,8 @@ export default class Keyboard {
         case KEYBOARD_KEYS.d:
           player.moving.right = true
           break
-        case KEYBOARD_KEYS.p: // Pause, only for debugging
+        case KEYBOARD_KEYS.ESC:
+        case KEYBOARD_KEYS.p:
           Game.paused = !Game.paused
           break
         default:

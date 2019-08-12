@@ -7,6 +7,9 @@ import Keyboard from '@app/peripherals/Keyboard'
 import Mouse from '@app/peripherals/Mouse'
 import Gamepads from '@app/peripherals/Gamepads'
 
+import FrameRate from './FrameRate'
+import PauseMenu from './menus/PauseMenu'
+
 export default class Game {
   public static paused: boolean = false
 
@@ -15,6 +18,13 @@ export default class Game {
   private map: Map
 
   constructor() {
+    window.onfocus = () => {
+      FrameRate.restart()
+    }
+    window.onblur = () => {
+      Game.paused = true
+    }
+
     AudioLoader.load()
 
     this.grid = new Grid()
@@ -32,8 +42,14 @@ export default class Game {
   private gameLoop(): void {
     if (Game.paused === false) {
       this.update()
+    }
+
+    if (FrameRate.nextFrameRenderingShouldBeSkipped() === false) {
       this.render()
     }
+
+    FrameRate.calculateFrameRate()
+
     window.requestAnimationFrame(() => this.gameLoop())
   }
 
@@ -48,5 +64,11 @@ export default class Game {
     Canvas.clear()
     this.map.draw()
     this.player.draw()
+
+    if (Game.paused) {
+      PauseMenu.render()
+    }
+
+    FrameRate.drawFPS() // TODO: Remove this, used just for debugging
   }
 }
