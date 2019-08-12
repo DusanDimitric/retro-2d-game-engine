@@ -19,4 +19,5 @@ export default abstract class GameObject {
   }
 
   public abstract draw(): void
+  public abstract takeDamage(damageAmount: number): void
 }

@@ -52,23 +52,6 @@ export default class Player {
     })
   }
 
-  public move(): void {
-    if (this.moving.left) {
-      this.x -= this.maxSpeed
-    }
-    if (this.moving.right) {
-      this.x += this.maxSpeed
-    }
-    if (this.moving.up) {
-      this.y -= this.maxSpeed
-    }
-    if (this.moving.down) {
-      this.y += this.maxSpeed
-    }
-    this.adjustCollisionWithGameObjects()
-    this.updateMapPosition()
-  }
-
   public shoot(): void {
     if (this.shooting && this.shootingCooldown <= 0) {
       const dx = (Canvas.mousePosition.x - Canvas.center.x)
@@ -123,6 +106,23 @@ export default class Player {
 
     Crosshair.draw()
     this.drawProjectiles()
+  }
+
+  private move(): void {
+    if (this.moving.left) {
+      this.x -= this.maxSpeed
+    }
+    if (this.moving.right) {
+      this.x += this.maxSpeed
+    }
+    if (this.moving.up) {
+      this.y -= this.maxSpeed
+    }
+    if (this.moving.down) {
+      this.y += this.maxSpeed
+    }
+    this.adjustCollisionWithGameObjects()
+    this.updateMapPosition()
   }
 
   private calculateTheta(): number {

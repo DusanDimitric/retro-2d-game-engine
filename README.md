@@ -33,6 +33,8 @@ npx tsc -p tsconfig.json
 ### Sound FX
 
 * MP5 SMG 9mm - By GunGuru from http://soundbible.com/2091-MP5-SMG-9mm.html
+* BULLET HITS SOUND FX - by ActionVFX from https://www.actionvfx.com/collections/free-vfx/category
+* 5 Hit Sounds + Dying - By TinyWorlds from https://opengameart.org/content/5-hit-sounds-dying
 
 ## Controls
 
