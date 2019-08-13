@@ -30,7 +30,9 @@ export default class Map {
 
   public draw(): void {
     this.drawGameObjects()
-    enemies.forEach(e => e.draw(this.player))
+    enemies
+      .filter(e => e.isOnScreen(this.player.x, this.player.y))
+      .forEach(e => e.draw(this.player))
   }
 
   private drawGameObjects(): void {

@@ -1,3 +1,5 @@
+import * as CONFIG from '@app/configuration/config.json'
+
 import Canvas, { context } from '@app/infrastructure/Canvas'
 import SoundFX from '@app/audio/SoundFX'
 import CollisionBox from '@app/infrastructure/CollisionBox'
@@ -60,6 +62,14 @@ export default class Enemy {
     SoundFX.playEnemyDeath()
     this.alive = false
   }
+
+  public isOnScreen(playerX: number, playerY: number): boolean {
+    return (
+      Math.abs(this.x - playerX) < (CONFIG.CANVAS_WIDTH  / 2) + CONFIG.TILE_SIZE &&
+      Math.abs(this.y - playerY) < (CONFIG.CANVAS_HEIGHT / 2) + CONFIG.TILE_SIZE
+    )
+  }
+
 
   private moveTowardsNode(): void {
     const distanceFromTargetNode = pointToPointDistance(
