@@ -16,6 +16,7 @@ export default class Enemy {
   }
   public collisionBox: CollisionBox = new CollisionBox(16, 16)
   private maxSpeed = 1
+  private maxSpeedDiagonal = Math.sin(45) * this.maxSpeed
   private movementPath: Point[]
   private targetPathNodeIndex: number = 1
 
@@ -79,16 +80,32 @@ export default class Enemy {
 
   private move(): void {
     if (this.moving.left) {
-      this.x -= this.maxSpeed
+      if (this.moving.up || this.moving.down) {
+        this.x -= this.maxSpeedDiagonal
+      } else {
+        this.x -= this.maxSpeed
+      }
     }
     if (this.moving.right) {
-      this.x += this.maxSpeed
+      if (this.moving.up || this.moving.down) {
+        this.x += this.maxSpeedDiagonal
+      } else {
+        this.x += this.maxSpeed
+      }
     }
     if (this.moving.up) {
-      this.y -= this.maxSpeed
+      if (this.moving.left || this.moving.right) {
+        this.y -= this.maxSpeedDiagonal
+      } else {
+        this.y -= this.maxSpeed
+      }
     }
     if (this.moving.down) {
-      this.y += this.maxSpeed
+      if (this.moving.left || this.moving.right) {
+        this.y += this.maxSpeedDiagonal
+      } else {
+        this.y += this.maxSpeed
+      }
     }
   }
 

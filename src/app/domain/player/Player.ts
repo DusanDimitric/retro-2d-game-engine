@@ -28,6 +28,7 @@ export default class Player {
   }
   private collisionBox: CollisionBox = new CollisionBox(12, 12)
   private maxSpeed = 3
+  private maxSpeedDiagonal = Math.sin(45) * this.maxSpeed
   private shooting = false
   private shootingCooldown = 6
   private projectiles: Projectile[] = []
@@ -110,16 +111,32 @@ export default class Player {
 
   private move(): void {
     if (this.moving.left) {
-      this.x -= this.maxSpeed
+      if (this.moving.up || this.moving.down) {
+        this.x -= this.maxSpeedDiagonal
+      } else {
+        this.x -= this.maxSpeed
+      }
     }
     if (this.moving.right) {
-      this.x += this.maxSpeed
+      if (this.moving.up || this.moving.down) {
+        this.x += this.maxSpeedDiagonal
+      } else {
+        this.x += this.maxSpeed
+      }
     }
     if (this.moving.up) {
-      this.y -= this.maxSpeed
+      if (this.moving.left || this.moving.right) {
+        this.y -= this.maxSpeedDiagonal
+      } else {
+        this.y -= this.maxSpeed
+      }
     }
     if (this.moving.down) {
-      this.y += this.maxSpeed
+      if (this.moving.left || this.moving.right) {
+        this.y += this.maxSpeedDiagonal
+      } else {
+        this.y += this.maxSpeed
+      }
     }
     this.adjustCollisionWithGameObjects()
     this.updateMapPosition()
