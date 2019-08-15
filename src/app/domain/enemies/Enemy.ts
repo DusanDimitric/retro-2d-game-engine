@@ -1,67 +1,44 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import Canvas, { context } from '@app/infrastructure/Canvas'
-import SoundFX from '@app/audio/SoundFX'
 import CollisionBox from '@app/infrastructure/CollisionBox'
-import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import Player from '@app/domain/player/Player'
 
-export default class Enemy {
+export default abstract class Enemy {
   public alive: boolean = true
   public maxHealth: number = 100
   public health: number
+
   public moving = {
     left  : false,
     right : false,
     up    : false,
     down  : false,
   }
-  public collisionBox: CollisionBox = new CollisionBox(16, 16)
-  private maxSpeed = 1
-  private maxSpeedDiagonal = Math.sin(45) * this.maxSpeed
-  private movementPath: Point[]
-  private targetPathNodeIndex: number = 1
+  public row: number
+  public col: number
+  public deltas = {
+    dyTop    : 0,
+    dyBottom : 0,
+    dxLeft   : 0,
+    dxRight  : 0,
+  }
+
+  protected maxSpeedDiagonal: number
 
   constructor(
     public x: number,
     public y: number,
+    public collisionBox: CollisionBox,
+    protected maxSpeed: number,
     healthPercentage: number
   ) {
-    if (healthPercentage < 0.0 || healthPercentage > 1.0) {
-      healthPercentage = 1.0
-    }
-    this.health = this.maxHealth * healthPercentage
+    this.initializeHealth(healthPercentage)
 
-    this.movementPath = [ // TODO: Delete this temp placeholder, get paths from the Map JSON
-      { x: this.x, y: this.y },
-      { x: this.x, y: this.y + 50 },
-    ]
-    this.moving.down = true // TODO: Remove this temp placeholder
+    this.maxSpeedDiagonal = Math.sin(45) * this.maxSpeed
   }
 
-  public update(): void {
-    this.moveTowardsNode()
-    this.move()
-  }
-
-  public draw(player: Player): void {
-    this.drawCollisionBox(player) // Just for debugging
-  }
-
-  public takeDamage(damageAmount: number) {
-    SoundFX.playEnemyHit()
-    this.health -= damageAmount
-    if (this.health <= 0) {
-      this.die()
-    } else {
-      SoundFX.playEnemyHit()
-    }
-  }
-
-  public die() {
-    SoundFX.playEnemyDeath()
-    this.alive = false
-  }
+  public abstract draw(player: Player): void
+  public abstract update(player: Player): void
 
   public isOnScreen(playerX: number, playerY: number): boolean {
     return (
@@ -70,70 +47,18 @@ export default class Enemy {
     )
   }
 
-
-  private moveTowardsNode(): void {
-    const distanceFromTargetNode = pointToPointDistance(
-      { x: this.movementPath[this.targetPathNodeIndex].x, y: this.movementPath[this.targetPathNodeIndex].y },
-      { x: this.x, y: this.y }
+  public collidesWithPlayer(playerX: number, playerY: number, playerCollisionBox: CollisionBox): boolean {
+    return (
+      this.x - this.collisionBox.halfWidth  < playerX + playerCollisionBox.halfWidth  &&
+      this.x + this.collisionBox.halfWidth  > playerX - playerCollisionBox.halfWidth  &&
+      this.y - this.collisionBox.halfHeight < playerY + playerCollisionBox.halfHeight &&
+      this.y + this.collisionBox.halfHeight > playerY - playerCollisionBox.halfHeight
     )
-    if (distanceFromTargetNode < 1) {
-      this.moveTowardsNextNode()
-    }
   }
 
-  private moveTowardsNextNode(): void {
-    this.targetPathNodeIndex = (this.targetPathNodeIndex + 1) % this.movementPath.length
+  public abstract takeDamage(damageAmount: number): void
 
-    this.moving.down = !this.moving.down // TODO: Remove this temp placeholder
-    this.moving.up   = !this.moving.up   // TODO: Remove this temp placeholder
-  }
-
-  private move(): void {
-    if (this.moving.left) {
-      if (this.moving.up || this.moving.down) {
-        this.x -= this.maxSpeedDiagonal
-      } else {
-        this.x -= this.maxSpeed
-      }
-    }
-    if (this.moving.right) {
-      if (this.moving.up || this.moving.down) {
-        this.x += this.maxSpeedDiagonal
-      } else {
-        this.x += this.maxSpeed
-      }
-    }
-    if (this.moving.up) {
-      if (this.moving.left || this.moving.right) {
-        this.y -= this.maxSpeedDiagonal
-      } else {
-        this.y -= this.maxSpeed
-      }
-    }
-    if (this.moving.down) {
-      if (this.moving.left || this.moving.right) {
-        this.y += this.maxSpeedDiagonal
-      } else {
-        this.y += this.maxSpeed
-      }
-    }
-  }
-
-  private drawCollisionBox(player: Player) {
-    context.strokeStyle = this.getHealthColor()
-    context.lineWidth = 0.5
-    context.beginPath()
-      // Since this is just for debugging purposes, there is no need to
-      // cache the vertex calculations.
-      context.moveTo( 0.5 + Canvas.center.x + (this.x - player.x) - this.collisionBox.halfWidth,  0.5 + Canvas.center.y + (this.y - player.y) - this.collisionBox.halfHeight)
-      context.lineTo(-0.5 + Canvas.center.x + (this.x - player.x) + this.collisionBox.halfWidth,  0.5 + Canvas.center.y + (this.y - player.y) - this.collisionBox.halfHeight)
-      context.lineTo(-0.5 + Canvas.center.x + (this.x - player.x) + this.collisionBox.halfWidth, -0.5 + Canvas.center.y + (this.y - player.y) + this.collisionBox.halfHeight)
-      context.lineTo( 0.5 + Canvas.center.x + (this.x - player.x) - this.collisionBox.halfWidth, -0.5 + Canvas.center.y + (this.y - player.y) + this.collisionBox.halfHeight)
-      context.lineTo( 0.5 + Canvas.center.x + (this.x - player.x) - this.collisionBox.halfWidth,  0.5 + Canvas.center.y + (this.y - player.y) - this.collisionBox.halfHeight)
-    context.stroke()
-  }
-
-  private getHealthColor(): string {
+  protected getHealthColor(): string {
     if (this.health <= this.maxHealth * 0.10) {
       return '#FF5700'
     } else if (this.health <= this.maxHealth * 0.20) {
@@ -157,5 +82,12 @@ export default class Enemy {
     } else if (this.health === this.maxHealth) {
       return '#6AFF00'
     }
+  }
+
+  private initializeHealth(healthPercentage: number): void {
+    if (healthPercentage < 0.0 || healthPercentage > 1.0) {
+      healthPercentage = 1.0
+    }
+    this.health = this.maxHealth * healthPercentage
   }
 }

@@ -3,6 +3,7 @@ import * as CONFIG from '@app/configuration/config.json'
 import Grid from '@app/domain/Grid'
 
 import Player from '@app/domain/player/Player'
+import ConcreateEnemy from '@app/domain/enemies/ConcreteEnemy'
 import Enemy from '@app/domain/enemies/Enemy'
 import Canvas from '@app/infrastructure/Canvas'
 import GameObject from '@app/domain/objects/GameObject'
@@ -14,6 +15,10 @@ import * as Map01 from '@app/resources/maps/Map-01.json'
 export const gameObjects: GameObject[][] = []
 export const enemies: Enemy[] = []
 
+export function getEnemiesOnScreen(playerX: number, playerY: number): Enemy[] {
+  return enemies.filter(e => e.isOnScreen(playerX, playerY))
+}
+
 export default class Map {
   constructor(private grid: Grid, private player: Player) {
     this.loadMap(Map01)
@@ -21,7 +26,7 @@ export default class Map {
 
   public update(): void {
     enemies.forEach((e, i) => {
-      e.update()
+      e.update(this.player)
       if (e.alive === false) {
         enemies.splice(i, 1) // Remove the enemy
       }
@@ -30,8 +35,7 @@ export default class Map {
 
   public draw(): void {
     this.drawGameObjects()
-    enemies
-      .filter(e => e.isOnScreen(this.player.x, this.player.y))
+    getEnemiesOnScreen(this.player.x, this.player.y)
       .forEach(e => e.draw(this.player))
   }
 
@@ -62,6 +66,6 @@ export default class Map {
       }
     }
 
-    map.enemies.forEach(e => enemies.push(new Enemy(e.x, e.y, e.healthPercentage)))
+    map.enemies.forEach(e => enemies.push(new ConcreateEnemy(e.x, e.y, e.healthPercentage)))
   }
 }

@@ -3,13 +3,15 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 import Raycaster from '@app/infrastructure/Raycaster'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 
-import { gameObjects } from '@app/domain/map/Map'
+import { gameObjects, getEnemiesOnScreen } from '@app/domain/map/Map'
 import Crosshair from './Crosshair'
 import Projectile from './Projectile'
 
 import SoundFX from '@app/audio/SoundFX'
+import Game from '@app/infrastructure/Game';
 
 export default class Player {
+  public alive: boolean = true
   public rotation: number = 0
   public moving = {
     left  : false,
@@ -139,6 +141,7 @@ export default class Player {
       }
     }
     this.adjustCollisionWithGameObjects()
+    this.checkForCollisionWithEnemies()
     this.updateMapPosition()
   }
 
@@ -324,4 +327,16 @@ export default class Player {
     }
   }
 
+  private checkForCollisionWithEnemies(): void {
+    if (getEnemiesOnScreen(this.x, this.y)
+      .filter(e => e.collidesWithPlayer(this.x, this.y, this.collisionBox))
+      .length > 0) {
+        this.die()
+      }
+  }
+
+  private die(): void {
+    this.alive = false
+    Game.paused = true // TODO: Implement proper game states
+  }
 }
