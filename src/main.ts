@@ -1,4 +1,4 @@
-import Game from '@app/infrastructure/Game'
+import Game from '@app/infrastructure/game/Game'
 
 const game: Game = new Game()
 game.start()

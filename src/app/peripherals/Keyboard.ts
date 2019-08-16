@@ -1,4 +1,4 @@
-import Game from '@app/infrastructure/Game'
+import Game from '@app/infrastructure/game/Game'
 import FrameRate from '@app/infrastructure/FrameRate'
 import Player from '@app/domain/player/Player'
 import { KEYBOARD_KEYS } from './constants/KeyCodes'
@@ -22,7 +22,7 @@ export default class Keyboard {
           break
         case KEYBOARD_KEYS.ESC:
         case KEYBOARD_KEYS.p:
-          Game.paused = !Game.paused
+          Game.togglePause()
           break
         default:
           break

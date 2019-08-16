@@ -52,9 +52,9 @@ export default class FrameRate {
   public static drawFPS() {
     context.beginPath()
       context.fillStyle = '#FFC100'
-      context.font = "8px Monospace"
+      context.font = '8px Monospace'
 
-      context.fillText(`FPS: ${FPS}`, 10, CONFIG.CANVAS_HEIGHT - 10)
+      context.fillText(`FPS: ${FPS && FPS.toFixed(2) || 'unknown'}`, 10, CONFIG.CANVAS_HEIGHT - 10)
     context.stroke()
   }
 }

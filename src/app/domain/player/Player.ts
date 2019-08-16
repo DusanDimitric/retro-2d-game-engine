@@ -8,7 +8,8 @@ import Crosshair from './Crosshair'
 import Projectile from './Projectile'
 
 import SoundFX from '@app/audio/SoundFX'
-import Game from '@app/infrastructure/Game';
+import Game from '@app/infrastructure/game/Game'
+import GameState from '@app/infrastructure/game/game_states/GameState'
 
 export default class Player {
   public alive: boolean = true
@@ -151,7 +152,7 @@ export default class Player {
       (Canvas.mousePosition.x - Canvas.center.x)
     )
     context.fillStyle = '#44FF44'
-    context.fillText(`θ = ${theta}`, 10, 56)
+    context.fillText(`θ = ${theta.toFixed(2)}`, 10, 56)
     return theta
   }
 
@@ -159,9 +160,9 @@ export default class Player {
     // Draw gun
     context.beginPath()
       context.fillStyle = '#00AA00'
-      context.font = "10px Monospace"
+      context.font = '10px Monospace'
 
-      context.fillText(`p (${this.x}, ${this.y})`, 10, 20)
+      context.fillText(`p (${this.x.toFixed(2)}, ${this.y.toFixed(2)})`, 10, 20)
 
       context.strokeStyle = '#523DA5'
       context.lineWidth = 2
@@ -337,6 +338,6 @@ export default class Player {
 
   private die(): void {
     this.alive = false
-    Game.paused = true // TODO: Implement proper game states
+    Game.state = GameState.paused
   }
 }
