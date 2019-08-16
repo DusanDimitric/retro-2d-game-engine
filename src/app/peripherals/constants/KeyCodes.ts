@@ -1,4 +1,5 @@
 export const KEYBOARD_KEYS = {
+  ENTER: 13,
   ESC: 27,
   w: 87,
   a: 65,

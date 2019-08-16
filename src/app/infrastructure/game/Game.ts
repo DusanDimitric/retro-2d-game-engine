@@ -10,7 +10,7 @@ export default class Game {
   public static loaded: boolean = false
   public static loadedPercentage: number = 0.0 // 0.0 to 1.0
 
-  public static state: IGameState
+  public static state: IGameState = GameState.loading
 
   public static togglePause(): void {
     if (Game.state === GameState.paused) {
@@ -24,34 +24,17 @@ export default class Game {
     window.onfocus = () => {
       FrameRate.restart()
     }
-    window.onblur = () => {
-      Game.state = GameState.paused
-    }
-
-    this.showLoadingProgress()
     AudioLoader.load(() => this.gameAssetLoaded(GameAssets.Audio))
-
-    Game.state = GameState.playing
   }
 
   public start(): void {
     const loadInterval = setInterval(() => {
       if (Game.loaded) {
         clearInterval(loadInterval)
-        this.finishInitialization()
-        window.requestAnimationFrame(() => this.gameLoop())
+        Game.state = GameState.mainMenu
+        this.gameLoop()
       }
     }, 250)
-  }
-
-  private showLoadingProgress(): void {
-    const loadingProgressElement = document.getElementById('loading-progress')
-    loadingProgressElement.style.display = 'block'
-    loadingProgressElement.textContent = `Loading... ${+(Game.loadedPercentage * 100)}%`
-  }
-
-  private hideLoadingProgress(): void {
-    document.getElementById('loading-progress').style.display = 'none'
   }
 
   private gameAssetLoaded(asset: GameAssets) {
@@ -61,11 +44,6 @@ export default class Game {
     if (Game.loadedPercentage === 1.0) {
       Game.loaded = true
     }
-  }
-
-  private finishInitialization(): void {
-    this.hideLoadingProgress()
-    Game.state.finishInitialization()
   }
 
   private gameLoop(): void {
@@ -88,7 +66,6 @@ export default class Game {
   private render(): void {
     Canvas.clear()
     Game.state.render()
-
     FrameRate.drawFPS() // TODO: Remove this, used just for debugging
   }
 }

@@ -1,5 +1,8 @@
 import IGameState from './IGameState'
 
+import Game from '@app/infrastructure/game/Game'
+import GameState from '@app/infrastructure/game/game_states/GameState'
+
 import Keyboard from '@app/peripherals/Keyboard'
 import Mouse from '@app/peripherals/Mouse'
 import Gamepads from '@app/peripherals/Gamepads'
@@ -17,9 +20,11 @@ export default class GameStatePlaying implements IGameState {
     this.grid = new Grid()
     this.player = new Player(128, 64)
     this.map = new Map(this.grid, this.player)
-  }
 
-  public finishInitialization(): void {
+    window.onblur = () => {
+      Game.state = GameState.paused
+    }
+
     Keyboard.init(this.player)
     Mouse.init(this.player)
   }
