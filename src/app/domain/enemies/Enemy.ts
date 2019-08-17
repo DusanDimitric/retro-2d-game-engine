@@ -34,7 +34,7 @@ export default abstract class Enemy {
   ) {
     this.initializeHealth(healthPercentage)
 
-    this.maxSpeedDiagonal = Math.sin(45) * this.maxSpeed
+    this.maxSpeedDiagonal = Math.round(Math.sin(45) * this.maxSpeed)
   }
 
   public abstract draw(player: Player): void

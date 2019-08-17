@@ -30,8 +30,8 @@ export default class Player {
     dxRight  : 0,
   }
   private collisionBox: CollisionBox = new CollisionBox(12, 12)
-  private maxSpeed = 3
-  private maxSpeedDiagonal = Math.sin(45) * this.maxSpeed
+  private maxSpeed: number = 3
+  private maxSpeedDiagonal: number = Math.round(Math.sin(45) * this.maxSpeed)
   private shooting = false
   private shootingCooldown = 6
   private projectiles: Projectile[] = []
@@ -162,7 +162,7 @@ export default class Player {
       context.fillStyle = '#00AA00'
       context.font = '10px Monospace'
 
-      context.fillText(`p (${this.x.toFixed(2)}, ${this.y.toFixed(2)})`, 10, 20)
+      context.fillText(`p (${this.x}, ${this.y})`, 10, 20)
 
       context.strokeStyle = '#523DA5'
       context.lineWidth = 2
@@ -178,11 +178,11 @@ export default class Player {
     context.beginPath()
       // Since this is just for debugging purposes, there is no need to
       // cache the vertex calculations.
-      context.moveTo( 0.5 + Canvas.center.x - this.collisionBox.halfWidth,  0.5 + Canvas.center.y - this.collisionBox.halfHeight)
-      context.lineTo(-0.5 + Canvas.center.x + this.collisionBox.halfWidth,  0.5 + Canvas.center.y - this.collisionBox.halfHeight)
-      context.lineTo(-0.5 + Canvas.center.x + this.collisionBox.halfWidth, -0.5 + Canvas.center.y + this.collisionBox.halfHeight)
-      context.lineTo( 0.5 + Canvas.center.x - this.collisionBox.halfWidth, -0.5 + Canvas.center.y + this.collisionBox.halfHeight)
-      context.lineTo( 0.5 + Canvas.center.x - this.collisionBox.halfWidth,  0.5 + Canvas.center.y - this.collisionBox.halfHeight)
+      context.moveTo(-0.5 + Canvas.center.x - this.collisionBox.halfWidth, -0.5 + Canvas.center.y - this.collisionBox.halfHeight)
+      context.lineTo( 0.5 + Canvas.center.x + this.collisionBox.halfWidth, -0.5 + Canvas.center.y - this.collisionBox.halfHeight)
+      context.lineTo( 0.5 + Canvas.center.x + this.collisionBox.halfWidth,  0.5 + Canvas.center.y + this.collisionBox.halfHeight)
+      context.lineTo(-0.5 + Canvas.center.x - this.collisionBox.halfWidth,  0.5 + Canvas.center.y + this.collisionBox.halfHeight)
+      context.lineTo(-0.5 + Canvas.center.x - this.collisionBox.halfWidth, -0.5 + Canvas.center.y - this.collisionBox.halfHeight)
     context.stroke()
   }
 
@@ -220,7 +220,7 @@ export default class Player {
       if (this.moving.left) {
         o = gameObjects[this.row][this.col - 1] // West
         if (o && this.x - this.collisionBox.halfWidth <= o.mapX + o.width) {
-          this.x = o.mapX + o.width + this.collisionBox.halfWidth
+          this.x = o.mapX + o.width + this.collisionBox.halfWidth + 1
         }
 
         const SWVertexRow = Math.floor((this.y + this.collisionBox.halfHeight - 1) / CONFIG.TILE_SIZE)
@@ -228,7 +228,7 @@ export default class Player {
           o = gameObjects[SWVertexRow][this.col - 1] // South West
           if (o && this.x - this.collisionBox.halfWidth <= o.mapX + o.width) {
             if (!(this.moving.down && this.deltas.dyTop <= this.deltas.dxRight)) {
-              this.x = o.mapX + o.width + this.collisionBox.halfWidth
+              this.x = o.mapX + o.width + this.collisionBox.halfWidth + 1
             }
           }
         }
@@ -238,7 +238,7 @@ export default class Player {
           o = gameObjects[NWVertexRow][this.col - 1] // North West
           if (o && this.x - this.collisionBox.halfWidth <= o.mapX + o.width) {
             if (!(this.moving.up && this.deltas.dyBottom <= this.deltas.dxRight)) {
-              this.x = o.mapX + o.width + this.collisionBox.halfWidth
+              this.x = o.mapX + o.width + this.collisionBox.halfWidth + 1
             }
           }
         }
@@ -246,7 +246,7 @@ export default class Player {
       if (this.moving.right) {
         o = gameObjects[this.row][this.col + 1] // East
         if (o && this.x + this.collisionBox.halfWidth >= o.mapX) {
-          this.x = o.mapX - this.collisionBox.halfWidth
+          this.x = o.mapX - this.collisionBox.halfWidth - 1
         }
 
         const SEVertexRow = Math.floor((this.y + this.collisionBox.halfHeight - 1) / CONFIG.TILE_SIZE)
@@ -254,7 +254,7 @@ export default class Player {
           o = gameObjects[SEVertexRow][this.col + 1] // South East
           if (o && this.x + this.collisionBox.halfWidth >= o.mapX) {
             if (!(this.moving.down && this.deltas.dyTop <= this.deltas.dxLeft)) {
-              this.x = o.mapX - this.collisionBox.halfWidth
+              this.x = o.mapX - this.collisionBox.halfWidth - 1
             }
           }
         }
@@ -264,7 +264,7 @@ export default class Player {
           o = gameObjects[NEVertexRow][this.col + 1] // North East
           if (o && this.x + this.collisionBox.halfWidth >= o.mapX) {
             if (!(this.moving.up && this.deltas.dyBottom <= this.deltas.dxLeft)) {
-              this.x = o.mapX - this.collisionBox.halfWidth
+              this.x = o.mapX - this.collisionBox.halfWidth - 1
             }
           }
         }
@@ -274,7 +274,7 @@ export default class Player {
       if (this.moving.up) {
         o = gameObjects[this.row - 1][this.col] // North
         if (o && this.y - this.collisionBox.halfHeight <= o.mapY + o.height) {
-          this.y = o.mapY + o.height + this.collisionBox.halfHeight
+          this.y = o.mapY + o.height + this.collisionBox.halfHeight + 1
         }
 
         const NEVertexCol = Math.floor((this.x + this.collisionBox.halfWidth - 1) / CONFIG.TILE_SIZE)
@@ -282,7 +282,7 @@ export default class Player {
           o = gameObjects[this.row - 1][NEVertexCol] // North East
           if (o && this.y - this.collisionBox.halfHeight <= o.mapY + o.height) {
             if (!(this.moving.right && this.deltas.dyBottom > this.deltas.dxLeft)) {
-              this.y = o.mapY + o.height + this.collisionBox.halfHeight
+              this.y = o.mapY + o.height + this.collisionBox.halfHeight + 1
             }
           }
         }
@@ -292,7 +292,7 @@ export default class Player {
           o = gameObjects[this.row - 1][NWVertexCol] // North West
           if (o && this.y - this.collisionBox.halfHeight <= o.mapY + o.height) {
             if (!(this.moving.left && this.deltas.dyBottom > this.deltas.dxRight)) {
-              this.y = o.mapY + o.height + this.collisionBox.halfHeight
+              this.y = o.mapY + o.height + this.collisionBox.halfHeight + 1
             }
           }
         }
@@ -302,7 +302,7 @@ export default class Player {
       if (this.moving.down) {
         o = gameObjects[this.row + 1][this.col] // South
         if (o && this.y + this.collisionBox.halfHeight >= o.mapY) {
-          this.y = o.mapY - this.collisionBox.halfHeight
+          this.y = o.mapY - this.collisionBox.halfHeight - 1
         }
       }
 
@@ -311,7 +311,7 @@ export default class Player {
         o = gameObjects[this.row + 1][SEVertexCol] // South East
         if (o && this.y + this.collisionBox.halfHeight >= o.mapY) {
           if (!(this.moving.right && this.deltas.dyTop > this.deltas.dxLeft)) {
-            this.y = o.mapY - this.collisionBox.halfHeight
+            this.y = o.mapY - this.collisionBox.halfHeight - 1
           }
         }
       }
@@ -321,7 +321,7 @@ export default class Player {
         o = gameObjects[this.row + 1][SWVertexCol] // South West
         if (o && this.y + this.collisionBox.halfHeight >= o.mapY) {
           if (!(this.moving.left && this.deltas.dyTop > this.deltas.dxRight)) {
-            this.y = o.mapY - this.collisionBox.halfHeight
+            this.y = o.mapY - this.collisionBox.halfHeight - 1
           }
         }
       }
@@ -338,6 +338,6 @@ export default class Player {
 
   private die(): void {
     this.alive = false
-    Game.state = GameState.paused
+    Game.stateManager.setState(Game.stateManager.paused)
   }
 }
