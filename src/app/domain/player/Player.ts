@@ -9,7 +9,8 @@ import Projectile from './Projectile'
 
 import SoundFX from '@app/audio/SoundFX'
 import Game from '@app/infrastructure/game/Game'
-import GameState from '@app/infrastructure/game/game_states/GameState'
+import GameStateManager from '@app/infrastructure/game/game_states/GameStateManager'
+import GAME_STATES from '@app/infrastructure/game/game_states/GameStates'
 
 export default class Player {
   public alive: boolean = true
@@ -338,6 +339,6 @@ export default class Player {
 
   private die(): void {
     this.alive = false
-    Game.stateManager.setState(Game.stateManager.paused)
+    Game.stateManager.setState(GAME_STATES.PAUSED)
   }
 }

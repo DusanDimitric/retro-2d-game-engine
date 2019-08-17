@@ -1,16 +1,23 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import IGameState from './IGameState'
-import GameState from './GameState'
 import { context } from '@app/infrastructure/Canvas'
+import GAME_STATES from './GameStates'
 
 export default class GameStatePaused implements IGameState {
+  public enter(): void {
+    return
+  }
+  public exit(): void {
+    return
+  }
+
   public update(): void {
     return
   }
 
   public render(): void {
-    GameState.playing.render()
+    GAME_STATES.PLAYING.render()
     this.drawPauseMenu()
   }
 

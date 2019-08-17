@@ -14,22 +14,27 @@ export default class SoundFX {
 
   private static ENEMY_DEATH: AudioBuffer[] = []
 
-  public static async load(): Promise<void> {
+  public static async load(setLoadedPercentage: (percentage: number) => void): Promise<void> {
+    // TODO: Load audio in parallel
     this.SMG[0] = await load('./audio/smg_1.wav')
     this.SMG[1] = await load('./audio/smg_2.wav')
     this.SMG[2] = await load('./audio/smg_3.wav')
     this.SMG[3] = await load('./audio/smg_4.wav')
     this.SMG[4] = await load('./audio/smg_5.wav')
+    setLoadedPercentage(0.40)
 
     this.CRATE_HIT[0] = await load('./audio/crate_hit_1.wav')
+    setLoadedPercentage(0.45)
 
     this.ENEMY_HIT[0] = await load('./audio/enemy_hit_1.mp3')
     this.ENEMY_HIT[1] = await load('./audio/enemy_hit_2.mp3')
     this.ENEMY_HIT[2] = await load('./audio/enemy_hit_3.mp3')
     this.ENEMY_HIT[3] = await load('./audio/enemy_hit_4.mp3')
     this.ENEMY_HIT[4] = await load('./audio/enemy_hit_5.mp3')
+    setLoadedPercentage(0.95)
 
     this.ENEMY_DEATH[0] = await load('./audio/enemy_die_1.mp3')
+    setLoadedPercentage(1.0)
   }
 
   public static playSMG(): void {

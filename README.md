@@ -53,3 +53,16 @@ Right analog stick - Aiming
 R1 - Shoot
 
 Inspired by [Red Faction 2 controls](https://www.gamesdatabase.org/Media/SYSTEM/Sony_Playstation_2/manual/Formated/Red_Faction_2_-_2002_-_THQ,_Inc..pdf).
+
+### Game State Machine
+
+Overview of game states and possible transitions:
+```
+                    ---------------------
+                  / ----------            \
+                 v v           \           \
+Loading ---> Main Menu ---> Playing ---> Paused
+                                ^         /
+                                 \       /
+                                   -----
+```

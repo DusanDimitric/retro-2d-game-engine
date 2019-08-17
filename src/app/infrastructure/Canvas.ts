@@ -30,7 +30,7 @@ export default class Canvas {
 
   public static getCanvasDomElement = (): HTMLCanvasElement => canvas
 
-  public static update() {
+  public static updateMousePosition() {
     this.mousePosition = {
       x: Math.floor((Mouse.x - canvas.offsetLeft) / CONFIG.SCALE),
       y: Math.floor((Mouse.y - canvas.offsetTop ) / CONFIG.SCALE)
