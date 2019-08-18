@@ -1,6 +1,7 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import CollisionBox from '@app/infrastructure/CollisionBox'
+import Point from '@app/infrastructure/geometry/Point'
 import Player from '@app/domain/player/Player'
 
 export default abstract class Enemy {
@@ -27,6 +28,7 @@ export default abstract class Enemy {
 
   protected distanceFromPlayer: number
   protected thereAreObstaclesBetweenPlayerAndThisEnemy: boolean
+  protected pathToPlayer: Point[]
 
   constructor(
     public x: number,
