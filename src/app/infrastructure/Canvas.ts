@@ -11,6 +11,8 @@ canvas.style.height = CONFIG.SCALE !== 1 ? (CONFIG.SCALE * CONFIG.CANVAS_HEIGHT)
 export const context = canvas.getContext('2d')
 
 export default class Canvas {
+  public static halfWidth  = canvas.width  / 2
+  public static halfHeight = canvas.height / 2
   public static rows = Math.floor(canvas.height / CONFIG.TILE_SIZE)
   public static cols = Math.floor(canvas.width  / CONFIG.TILE_SIZE)
   public static halfRows = Math.floor((canvas.height / 2) / CONFIG.TILE_SIZE)

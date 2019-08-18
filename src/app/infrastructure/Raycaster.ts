@@ -8,14 +8,17 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 
 export default class Raycaster {
   /**
+   * @param p     - Point from which to start Raycasting
+   * @param theta - Ray angle
+   * @param pEnd? - Optional ending point up to which the cast will be performed
+   *
    * @returns {
    *   hitObject, // the game object that has been hit. If no object are hit - hitObject is `null`
-   *   // TODO: Make the hit point the edge of the screen in worst case so the player can't see what's beyond (+ some offset maybe if you want the player to see beyond)
    *   hitPoint   // can be either a point where the ray intersects a game object, or a just a point outside the screen if no object is hit
    * }
    * // TODO: Make casting possible between any 2 arbitrary points, not just from 1 point to off-screen
    */
-  public static cast(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  public static cast(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
     if (theta >= 0) { // South
       const yInt = p.deltas.dyBottom
       const xInt = p.deltas.dyBottom / Math.tan(theta)
@@ -46,10 +49,10 @@ export default class Raycaster {
     context.strokeStyle = color
     context.lineWidth = 0.5
     context.beginPath()
-      context.moveTo(Canvas.center.x, Canvas.center.y)
+      context.moveTo(Canvas.halfWidth, Canvas.halfHeight)
       context.lineTo(
-        Canvas.center.x + hitPoint.x,
-        Canvas.center.y + hitPoint.y
+        Canvas.halfWidth + hitPoint.x,
+        Canvas.halfHeight + hitPoint.y
       )
     context.stroke()
     context.lineWidth = 1
@@ -76,15 +79,15 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxRight > Canvas.center.x) || (yIntercept > Canvas.center.y)) {
+      if ((tileStepX + p.deltas.dxRight > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
         break
       }
 
       if (CONFIG.RAYCASTER.DEBUG) {
         context.beginPath()
         context.arc(
-          Canvas.center.x + p.deltas.dxRight + tileStepX,
-          Canvas.center.y + yIntercept,
+          Canvas.halfWidth + p.deltas.dxRight + tileStepX,
+          Canvas.halfHeight + yIntercept,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
@@ -118,7 +121,7 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyBottom > Canvas.center.y) || (xIntercept > Canvas.center.x)) {
+      if ((tileStepY + p.deltas.dyBottom > Canvas.halfHeight) || (xIntercept > Canvas.halfWidth)) {
         break
       }
 
@@ -126,8 +129,8 @@ export default class Raycaster {
         context.strokeStyle = '#44FF44'
         context.beginPath()
         context.arc(
-          Canvas.center.x + xIntercept,
-          Canvas.center.y + p.deltas.dyBottom + tileStepY,
+          Canvas.halfWidth + xIntercept,
+          Canvas.halfHeight + p.deltas.dyBottom + tileStepY,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
@@ -219,15 +222,15 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxRight > Canvas.center.x) || (yIntercept > Canvas.center.y)) {
+      if ((tileStepX + p.deltas.dxRight > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
         break
       }
 
       if (CONFIG.RAYCASTER.DEBUG) {
         context.beginPath()
         context.arc(
-          Canvas.center.x + tileStepX + p.deltas.dxRight,
-          Canvas.center.y - yIntercept,
+          Canvas.halfWidth + tileStepX + p.deltas.dxRight,
+          Canvas.halfHeight - yIntercept,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
@@ -261,7 +264,7 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyTop > Canvas.center.y) || (xIntercept > Canvas.center.x)) {
+      if ((tileStepY + p.deltas.dyTop > Canvas.halfHeight) || (xIntercept > Canvas.halfWidth)) {
         break
       }
 
@@ -269,8 +272,8 @@ export default class Raycaster {
         context.strokeStyle = '#44FF44'
         context.beginPath()
         context.arc(
-          Canvas.center.x + xIntercept,
-          Canvas.center.y - tileStepY - p.deltas.dyTop,
+          Canvas.halfWidth + xIntercept,
+          Canvas.halfHeight - tileStepY - p.deltas.dyTop,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
@@ -361,15 +364,15 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxLeft > Canvas.center.x) || (yIntercept > Canvas.center.y)) {
+      if ((tileStepX + p.deltas.dxLeft > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
         break
       }
 
       if (CONFIG.RAYCASTER.DEBUG) {
         context.beginPath()
         context.arc(
-          Canvas.center.x - tileStepX - p.deltas.dxLeft,
-          Canvas.center.y - yIntercept,
+          Canvas.halfWidth - tileStepX - p.deltas.dxLeft,
+          Canvas.halfHeight - yIntercept,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
@@ -403,7 +406,7 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyTop > Canvas.center.y) || (xIntercept > Canvas.center.x)) {
+      if ((tileStepY + p.deltas.dyTop > Canvas.halfHeight) || (xIntercept > Canvas.halfWidth)) {
         break
       }
 
@@ -411,8 +414,8 @@ export default class Raycaster {
         context.strokeStyle = '#44FF44'
         context.beginPath()
         context.arc(
-          Canvas.center.x - xIntercept,
-          Canvas.center.y - tileStepY - p.deltas.dyTop,
+          Canvas.halfWidth - xIntercept,
+          Canvas.halfHeight - tileStepY - p.deltas.dyTop,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
@@ -504,15 +507,15 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxLeft > Canvas.center.x) || (yIntercept > Canvas.center.y)) {
+      if ((tileStepX + p.deltas.dxLeft > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
         break
       }
 
       if (CONFIG.RAYCASTER.DEBUG) {
         context.beginPath()
         context.arc(
-          Canvas.center.x - p.deltas.dxLeft - tileStepX,
-          Canvas.center.y + yIntercept,
+          Canvas.halfWidth - p.deltas.dxLeft - tileStepX,
+          Canvas.halfHeight + yIntercept,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
@@ -546,7 +549,7 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyBottom > Canvas.center.y) || (-xIntercept > Canvas.center.x)) {
+      if ((tileStepY + p.deltas.dyBottom > Canvas.halfHeight) || (-xIntercept > Canvas.halfWidth)) {
         break
       }
 
@@ -554,8 +557,8 @@ export default class Raycaster {
         context.strokeStyle = '#44FF44'
         context.beginPath()
         context.arc(
-          Canvas.center.x + xIntercept,
-          Canvas.center.y + p.deltas.dyBottom + tileStepY,
+          Canvas.halfWidth + xIntercept,
+          Canvas.halfHeight + p.deltas.dyBottom + tileStepY,
           2, 0, (2 * Math.PI)
         )
         context.stroke()
