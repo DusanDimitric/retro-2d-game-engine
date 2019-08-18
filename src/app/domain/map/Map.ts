@@ -26,7 +26,7 @@ export default class Map {
 
   public update(): void {
     enemies.forEach((e, i) => {
-      e.update(this.player)
+      e.update(this.player, enemies)
       if (e.alive === false) {
         enemies.splice(i, 1) // Remove the enemy
       }

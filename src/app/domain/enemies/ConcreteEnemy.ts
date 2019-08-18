@@ -22,8 +22,9 @@ export default class ConcreateEnemy extends Enemy {
     this.updateMapPosition()
   }
 
-  public update(player: Player): void {
+  public update(player: Player, enemies: Enemy[]): void {
     this.adjustCollisionWithGameObjects()
+    this.adjustCollisionWithOtherEnemies(enemies)
     this.distanceFromPlayer = pointToPointDistance(
       { x: player.x, y: player.y },
       { x: this.x,   y: this.y   }
