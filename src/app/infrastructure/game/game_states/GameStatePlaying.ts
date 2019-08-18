@@ -10,7 +10,7 @@ import Gamepads from '@app/peripherals/Gamepads'
 import Grid from '@app/domain/Grid'
 import Map from '@app/domain/map/Map'
 import Player from '@app/domain/player/Player'
-import GAME_STATES from './GameStates';
+import GAME_STATES from './GameStates'
 
 export default class GameStatePlaying implements IGameState {
   private grid: Grid
