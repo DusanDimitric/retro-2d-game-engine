@@ -23,6 +23,11 @@
       "x": 286,
       "y": 88,
       "healthPercentage": 1
+    },
+    {
+      "x": 368,
+      "y": 90,
+      "healthPercentage": 0.5
     }
   ]
 }
