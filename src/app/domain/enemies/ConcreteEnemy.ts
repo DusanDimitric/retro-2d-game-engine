@@ -4,7 +4,8 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 import SoundFX from '@app/audio/SoundFX'
 import { gameObjects } from '@app/domain/map/Map'
 import CollisionBox from '@app/infrastructure/CollisionBox'
-import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
+import Raycaster from '@app/infrastructure/Raycaster'
+import Point, { pointToPointDistance, angleBetweenPoints } from '@app/infrastructure/geometry/Point'
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
 
@@ -20,13 +21,19 @@ export default class ConcreateEnemy extends Enemy {
 
   public update(player: Player): void {
     this.adjustCollisionWithGameObjects()
-    this.moveTowardsPlayer(player)
+    this.distanceFromPlayer = pointToPointDistance(
+      { x: player.x, y: player.y },
+      { x: this.x,   y: this.y   }
+    )
+    this.determineIfThereAreObstaclesBetweenThisEnemyAndThePlayer(player)
+    this.findPathToPlayer(player)
     this.move()
     this.updateTileDeltas()
   }
 
   public draw(player: Player): void {
     this.drawCollisionBox(player) // Just for debugging
+    this.drawRayToPlayer(player) // TODO: Just for debugging
   }
 
   public takeDamage(damageAmount: number): void {
@@ -159,12 +166,18 @@ export default class ConcreateEnemy extends Enemy {
     }
   }
 
+  private findPathToPlayer(player: Player): void {
+    if (this.thereAreObstaclesBetweenPlayerAndThisEnemy) {
+      // TODO: Find path...
+      this.moveTowardsPlayer(player)
+    }
+    else {
+      this.moveTowardsPlayer(player)
+    }
+  }
+
   private moveTowardsPlayer(player: Player): void {
-    const distanceFromPlayer = pointToPointDistance(
-      { x: player.x, y: player.y },
-      { x: this.x, y: this.y }
-    )
-    if (distanceFromPlayer > 1) {
+    if (this.distanceFromPlayer > 1) {
       this.moveTowards(player.x, player.y)
     }
   }
@@ -235,6 +248,18 @@ export default class ConcreateEnemy extends Enemy {
     this.deltas.dxRight = CONFIG.TILE_SIZE - this.deltas.dxLeft
   }
 
+  private determineIfThereAreObstaclesBetweenThisEnemyAndThePlayer(player: Player): void {
+    const angleBetweenPlayerAndEnemy = angleBetweenPoints(
+      { x: this.x,   y: this.y   },
+      { x: player.x, y: player.y }
+    )
+    const { hitPoint } = Raycaster.cast(player, angleBetweenPlayerAndEnemy)
+    this.thereAreObstaclesBetweenPlayerAndThisEnemy = (
+      this.distanceFromPlayer > pointToPointDistance(hitPoint, { x: 0, y: 0 })
+    )
+
+  }
+
   // TODO: Compose this functionality since it's shared between enemies and player
   private drawCollisionBox(player: Player) {
     context.strokeStyle = this.getHealthColor()
@@ -250,4 +275,17 @@ export default class ConcreateEnemy extends Enemy {
     context.stroke()
   }
 
+  // TODO: Just for debugging
+  private drawRayToPlayer(player: Player) {
+    if (this.thereAreObstaclesBetweenPlayerAndThisEnemy) {
+      context.strokeStyle = '#FFFF44'
+    } else {
+      context.strokeStyle = '#00F0FF'
+    }
+    context.lineWidth = 0.5
+    context.beginPath()
+      context.moveTo(Canvas.center.x + (this.x - player.x), Canvas.center.y + (this.y - player.y))
+      context.lineTo(Canvas.center.x, Canvas.center.y)
+    context.stroke()
+  }
 }

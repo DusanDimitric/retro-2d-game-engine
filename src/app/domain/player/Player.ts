@@ -2,6 +2,7 @@ import * as CONFIG from '@app/configuration/config.json'
 import Canvas, { context } from '@app/infrastructure/Canvas'
 import Raycaster from '@app/infrastructure/Raycaster'
 import CollisionBox from '@app/infrastructure/CollisionBox'
+import { angleBetweenPoints } from '@app/infrastructure/geometry/Point'
 
 import { gameObjects, getEnemiesOnScreen } from '@app/domain/map/Map'
 import Crosshair from './Crosshair'
@@ -148,10 +149,7 @@ export default class Player {
   }
 
   private calculateTheta(): number {
-    const theta = Math.atan2(
-      (Canvas.mousePosition.y - Canvas.center.y),
-      (Canvas.mousePosition.x - Canvas.center.x)
-    )
+    const theta = angleBetweenPoints(Canvas.mousePosition, Canvas.center)
     context.fillStyle = '#44FF44'
     context.fillText(`θ = ${theta.toFixed(2)}`, 10, 56)
     return theta

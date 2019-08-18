@@ -25,6 +25,9 @@ export default abstract class Enemy {
 
   protected maxSpeedDiagonal: number
 
+  protected distanceFromPlayer: number
+  protected thereAreObstaclesBetweenPlayerAndThisEnemy: boolean
+
   constructor(
     public x: number,
     public y: number,
