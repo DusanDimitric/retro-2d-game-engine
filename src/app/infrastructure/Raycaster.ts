@@ -14,6 +14,8 @@ export default class Raycaster {
    *   // TODO: Make the hit point the edge of the screen in worst case so the player can't see what's beyond (+ some offset maybe if you want the player to see beyond)
    *   hitPoint   // can be either a point where the ray intersects a game object, or a just a point outside the screen if no object is hit
    * }
+   * // TODO: Make casting possible from any 2 arbitrary points, not just the player
+   * // TODO: Make casting possible between any 2 arbitrary points, not just from player to off-screen
    */
   public static cast(p: Player, theta: number): { hitPoint: Point, hitObject: GameObject } {
     if (theta >= 0) { // South
