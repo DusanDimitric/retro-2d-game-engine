@@ -1,7 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import Point from '@app/infrastructure/geometry/Point'
-import Player from '@app/domain/player/Player'
 import GameObject from '@app/domain/objects/GameObject'
 import { gameObjects } from '@app/domain/map/Map'
 
@@ -14,10 +13,9 @@ export default class Raycaster {
    *   // TODO: Make the hit point the edge of the screen in worst case so the player can't see what's beyond (+ some offset maybe if you want the player to see beyond)
    *   hitPoint   // can be either a point where the ray intersects a game object, or a just a point outside the screen if no object is hit
    * }
-   * // TODO: Make casting possible from any 2 arbitrary points, not just the player
-   * // TODO: Make casting possible between any 2 arbitrary points, not just from player to off-screen
+   * // TODO: Make casting possible between any 2 arbitrary points, not just from 1 point to off-screen
    */
-  public static cast(p: Player, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  public static cast(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
     if (theta >= 0) { // South
       const yInt = p.deltas.dyBottom
       const xInt = p.deltas.dyBottom / Math.tan(theta)
@@ -58,7 +56,7 @@ export default class Raycaster {
   }
 
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointSE(p: Player, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointSE(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -201,7 +199,7 @@ export default class Raycaster {
   }
 
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointNE(p: Player, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointNE(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -343,7 +341,7 @@ export default class Raycaster {
     }
   }
 
-  private static getInterceptPointNW(p: Player, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointNW(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -486,7 +484,7 @@ export default class Raycaster {
   }
 
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointSW(p: Player, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointSW(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -628,7 +626,7 @@ export default class Raycaster {
     }
   }
 
-  private static checkGameObjectCollisionVerticalSE(i: number, p: Player, yIntercept: number): GameObject {
+  private static checkGameObjectCollisionVerticalSE(i: number, p: Point, yIntercept: number): GameObject {
     const xTile = 1 + p.col + i
     const yTile = p.row + Math.floor((p.deltas.dyTop + yIntercept) / CONFIG.TILE_SIZE)
 
@@ -643,7 +641,7 @@ export default class Raycaster {
 
     return gameObjectHit
   }
-  private static checkGameObjectCollisionHorizontalSE(i: number, p: Player, xIntercept: number): GameObject {
+  private static checkGameObjectCollisionHorizontalSE(i: number, p: Point, xIntercept: number): GameObject {
     const xTile = p.col + Math.floor((p.deltas.dxLeft + xIntercept) / CONFIG.TILE_SIZE)
     const yTile = p.row + i + 1
 
@@ -659,7 +657,7 @@ export default class Raycaster {
     return gameObjectHit
   }
 
-  private static checkGameObjectCollisionVerticalNE(i: number, p: Player, yIntercept: number): GameObject {
+  private static checkGameObjectCollisionVerticalNE(i: number, p: Point, yIntercept: number): GameObject {
     const xTile = 1 + p.col + i
     const yTile = p.row + Math.floor((p.deltas.dyTop - yIntercept) / CONFIG.TILE_SIZE)
 
@@ -674,7 +672,7 @@ export default class Raycaster {
 
     return gameObjectHit
   }
-  private static checkGameObjectCollisionHorizontalNE(i: number, p: Player, xIntercept: number): GameObject {
+  private static checkGameObjectCollisionHorizontalNE(i: number, p: Point, xIntercept: number): GameObject {
     const xTile = p.col + Math.floor((p.deltas.dxLeft + xIntercept) / CONFIG.TILE_SIZE)
     const yTile = p.row - i - 1
 
@@ -690,7 +688,7 @@ export default class Raycaster {
     return gameObjectHit
   }
 
-  private static checkGameObjectCollisionVerticalNW(i: number, p: Player, yIntercept: number): GameObject {
+  private static checkGameObjectCollisionVerticalNW(i: number, p: Point, yIntercept: number): GameObject {
     const xTile = - 1 + p.col - i
     const yTile = p.row + Math.floor((p.deltas.dyTop - yIntercept) / CONFIG.TILE_SIZE)
 
@@ -705,7 +703,7 @@ export default class Raycaster {
 
     return gameObjectHit
   }
-  private static checkGameObjectCollisionHorizontalNW(i: number, p: Player, xIntercept: number): GameObject {
+  private static checkGameObjectCollisionHorizontalNW(i: number, p: Point, xIntercept: number): GameObject {
     const xTile = p.col - Math.floor((p.deltas.dxRight + xIntercept) / CONFIG.TILE_SIZE)
     const yTile = p.row - i - 1
 
@@ -721,7 +719,7 @@ export default class Raycaster {
     return gameObjectHit
   }
 
-  private static checkGameObjectCollisionVerticalSW(i: number, p: Player, yIntercept: number): GameObject {
+  private static checkGameObjectCollisionVerticalSW(i: number, p: Point, yIntercept: number): GameObject {
     const xTile = p.col - i - 1
     const yTile = p.row + Math.floor((p.deltas.dyTop + yIntercept) / CONFIG.TILE_SIZE)
 
@@ -736,7 +734,7 @@ export default class Raycaster {
 
     return gameObjectHit
   }
-  private static checkGameObjectCollisionHorizontalSW(i: number, p: Player, xIntercept: number): GameObject {
+  private static checkGameObjectCollisionHorizontalSW(i: number, p: Point, xIntercept: number): GameObject {
     const xTile = p.col - Math.floor((p.deltas.dxRight - xIntercept) / CONFIG.TILE_SIZE)
     const yTile = p.row + i + 1
 

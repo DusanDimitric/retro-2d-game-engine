@@ -1,6 +1,14 @@
 export default interface Point {
   x: number
   y: number
+  row?: number
+  col?: number
+  deltas?: {
+    dyTop    : number
+    dyBottom : number
+    dxLeft   : number
+    dxRight  : number
+  }
 }
 
 export function pointToPointDistance(p1: Point, p2: Point) {
