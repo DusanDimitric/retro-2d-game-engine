@@ -20,27 +20,25 @@ export default class Raycaster {
    */
   public static cast(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
     if (theta >= 0) { // South
-      const yInt = p.deltas.dyBottom
       const xInt = p.deltas.dyBottom / Math.tan(theta)
 
       if (xInt >= 0) { // South East
-        return Raycaster.getInterceptPointSE(p, theta)
+        return Raycaster.getInterceptPointSE(p, theta, pEnd)
       }
       else if (xInt < 0) { // South West
-        return Raycaster.getInterceptPointSW(p, theta)
+        return Raycaster.getInterceptPointSW(p, theta, pEnd)
       }
     } else { // North
-      const yInt = p.deltas.dyTop
       const xInt = p.deltas.dyTop / Math.tan(-theta)
 
       // We must check if xInt is positive because sometimes it can be: 0 or -0
       const xIntIsPositive = (1 / xInt) > 0
 
       if (xInt >= 0 && xIntIsPositive) { // North East
-        return Raycaster.getInterceptPointNE(p, theta)
+        return Raycaster.getInterceptPointNE(p, theta, pEnd)
       }
       else { // North West
-        return Raycaster.getInterceptPointNW(p, theta)
+        return Raycaster.getInterceptPointNW(p, theta, pEnd)
       }
     }
   }
@@ -58,8 +56,12 @@ export default class Raycaster {
     context.lineWidth = 1
   }
 
+  private static outsideOfScreenOffset = CONFIG.TILE_SIZE * 2
+  private static rangeHorizontal: number = Canvas.halfWidth  + Raycaster.outsideOfScreenOffset
+  private static rangeVertical: number   = Canvas.halfHeight + Raycaster.outsideOfScreenOffset
+
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointSE(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointSE(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -79,17 +81,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxRight > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
+      if ((tileStepX + p.deltas.dxRight > Raycaster.rangeHorizontal) || (yIntercept > Raycaster.rangeVertical)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if (tileStepX + p.deltas.dxRight > (pEnd.x - p.x) || yIntercept > (pEnd.y - p.y)) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) + p.deltas.dxRight + tileStepX,
+            y: Canvas.center.y - (pEnd.y - p.y) + yIntercept,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x + p.deltas.dxRight + tileStepX,
+            y: Canvas.center.y + yIntercept,
+          }
+        }
+        context.strokeStyle = '#4444FF'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth + p.deltas.dxRight + tileStepX,
-          Canvas.halfHeight + yIntercept,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
@@ -121,18 +139,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyBottom > Canvas.halfHeight) || (xIntercept > Canvas.halfWidth)) {
+      if ((tileStepY + p.deltas.dyBottom > Raycaster.rangeVertical) || (xIntercept > Raycaster.rangeHorizontal)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if (tileStepY + p.deltas.dyBottom > (pEnd.y - p.y) || Math.round(xIntercept) > (pEnd.x - p.x)) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) + xIntercept,
+            y: Canvas.center.y - (pEnd.y - p.y) + p.deltas.dyBottom + tileStepY,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x + xIntercept,
+            y: Canvas.center.y + p.deltas.dyBottom + tileStepY,
+          }
+        }
         context.strokeStyle = '#44FF44'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth + xIntercept,
-          Canvas.halfHeight + p.deltas.dyBottom + tileStepY,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
@@ -202,7 +235,7 @@ export default class Raycaster {
   }
 
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointNE(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointNE(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -222,17 +255,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxRight > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
+      if ((tileStepX + p.deltas.dxRight > Raycaster.rangeHorizontal) || (yIntercept > Raycaster.rangeVertical)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if (tileStepX + p.deltas.dxRight > (pEnd.x - p.x) || yIntercept > (p.y - pEnd.y)) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) + p.deltas.dxRight + tileStepX,
+            y: Canvas.center.y - (pEnd.y - p.y) - yIntercept,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x + p.deltas.dxRight + tileStepX,
+            y: Canvas.center.y - yIntercept,
+          }
+        }
+        context.strokeStyle = '#4444FF'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth + tileStepX + p.deltas.dxRight,
-          Canvas.halfHeight - yIntercept,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
@@ -264,18 +313,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyTop > Canvas.halfHeight) || (xIntercept > Canvas.halfWidth)) {
+      if ((tileStepY + p.deltas.dyTop > Raycaster.rangeVertical) || (xIntercept > Raycaster.rangeHorizontal)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if (tileStepY + p.deltas.dyTop > (p.y - pEnd.y) || Math.round(xIntercept) > (pEnd.x - p.x)) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) + xIntercept,
+            y: Canvas.center.y - (pEnd.y - p.y) - p.deltas.dyTop - tileStepY,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x + xIntercept,
+            y: Canvas.center.y - tileStepY - p.deltas.dyTop,
+          }
+        }
         context.strokeStyle = '#44FF44'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth + xIntercept,
-          Canvas.halfHeight - tileStepY - p.deltas.dyTop,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
@@ -344,7 +408,8 @@ export default class Raycaster {
     }
   }
 
-  private static getInterceptPointNW(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  // TODO: This is a naive implementation! Add 6x optimization
+  private static getInterceptPointNW(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -364,17 +429,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxLeft > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
+      if ((tileStepX + p.deltas.dxLeft > Raycaster.rangeHorizontal) || (yIntercept > Raycaster.rangeVertical)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if (tileStepX + p.deltas.dxLeft > (p.x - pEnd.x) || yIntercept > (p.y - pEnd.y)) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) - p.deltas.dxLeft - tileStepX,
+            y: Canvas.center.y - (pEnd.y - p.y) - yIntercept,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x - p.deltas.dxLeft - tileStepX,
+            y: Canvas.center.y - yIntercept,
+          }
+        }
+        context.strokeStyle = '#4444FF'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth - tileStepX - p.deltas.dxLeft,
-          Canvas.halfHeight - yIntercept,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
@@ -406,18 +487,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyTop > Canvas.halfHeight) || (xIntercept > Canvas.halfWidth)) {
+      if ((tileStepY + p.deltas.dyTop > Raycaster.rangeVertical) || (xIntercept > Raycaster.rangeHorizontal)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if (tileStepY + p.deltas.dyTop > (p.y - pEnd.y) || Math.round(xIntercept) > (p.x - pEnd.x)) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) - xIntercept,
+            y: Canvas.center.y - (pEnd.y - p.y) - p.deltas.dyTop - tileStepY,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x - xIntercept,
+            y: Canvas.center.y - p.deltas.dyTop - tileStepY,
+          }
+        }
         context.strokeStyle = '#44FF44'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth - xIntercept,
-          Canvas.halfHeight - tileStepY - p.deltas.dyTop,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
@@ -487,7 +583,7 @@ export default class Raycaster {
   }
 
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointSW(p: Point, theta: number): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointSW(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -507,17 +603,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepX + p.deltas.dxLeft > Canvas.halfWidth) || (yIntercept > Canvas.halfHeight)) {
+      if ((tileStepX + p.deltas.dxLeft > Raycaster.rangeHorizontal) || (yIntercept > Raycaster.rangeVertical)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if (tileStepX + p.deltas.dxLeft > (p.x - pEnd.x) || yIntercept > (pEnd.y - p.y)) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) - p.deltas.dxLeft - tileStepX,
+            y: Canvas.center.y - (pEnd.y - p.y) + yIntercept,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x - p.deltas.dxLeft - tileStepX,
+            y: Canvas.center.y + yIntercept,
+          }
+        }
+        context.strokeStyle = '#4444FF'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth - p.deltas.dxLeft - tileStepX,
-          Canvas.halfHeight + yIntercept,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
@@ -549,18 +661,33 @@ export default class Raycaster {
       }
 
       // Outside of screen check
-      if ((tileStepY + p.deltas.dyBottom > Canvas.halfHeight) || (-xIntercept > Canvas.halfWidth)) {
+      if ((tileStepY + p.deltas.dyBottom > Raycaster.rangeVertical) || (-xIntercept > Raycaster.rangeHorizontal)) {
         break
       }
 
+      // Don't cast beyond pEnd
+      if (pEnd) {
+        if ((tileStepY + p.deltas.dyBottom > (pEnd.y - p.y)) || (-xIntercept > (p.x - pEnd.x))) {
+          break
+        }
+      }
+
       if (CONFIG.RAYCASTER.DEBUG) {
+        let coordinates: Point
+        if (pEnd) {
+          coordinates = {
+            x: Canvas.center.x - (pEnd.x - p.x) + xIntercept,
+            y: Canvas.center.y - (pEnd.y - p.y) + p.deltas.dyBottom + tileStepY,
+          }
+        } else {
+          coordinates = {
+            x: Canvas.center.x + xIntercept,
+            y: Canvas.center.y + p.deltas.dyBottom + tileStepY,
+          }
+        }
         context.strokeStyle = '#44FF44'
         context.beginPath()
-        context.arc(
-          Canvas.halfWidth + xIntercept,
-          Canvas.halfHeight + p.deltas.dyBottom + tileStepY,
-          2, 0, (2 * Math.PI)
-        )
+        context.arc(coordinates.x, coordinates.y, 2, 0, (2 * Math.PI))
         context.stroke()
       }
 
