@@ -28,8 +28,8 @@ import Enemy from '@app/domain/enemies/Enemy'
  *      o      o          o      o
  */
 // TODO: cache path nodes for same collision box dimensions || don't generate path nodes every frame
-export function generatePathNodes(startRow: number, startCol: number, cBox: CollisionBox): Point[] {
-  const path: Point[] = []
+export function generatePathNodes(startRow: number, startCol: number, cBox: CollisionBox): PathNode[] {
+  const path: PathNode[] = []
 
   const rowOffset = 3
   const colOffset = 2
@@ -44,14 +44,14 @@ export function generatePathNodes(startRow: number, startCol: number, cBox: Coll
   for (let row = rowStart; row < rowEnd; ++row) {
     for (let col = colStart - 1; col < colEnd; ++col) {
       if (!gameObjects[row] || !gameObjects[row][col]) { continue }
-      generateNodeAroundGameObject(path, gameObjects[row][col], cBox)
+      generateNodesAroundGameObject(path, gameObjects[row][col], cBox)
     }
   }
 
   return path
 }
 
-function generateNodeAroundGameObject(path: Point[], o: GameObject, cBox: CollisionBox): void {
+function generateNodesAroundGameObject(path: PathNode[], o: GameObject, cBox: CollisionBox): void {
   const neighbours: Directions = {
     N  : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col    ] : null,
     NE : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col + 1] : null,
@@ -86,114 +86,114 @@ function generateNodeAroundGameObject(path: Point[], o: GameObject, cBox: Collis
   if (nodeNW) { path.push(nodeNW) }
 }
 
-function generateNodeNE(o: GameObject, neighbours: Directions, cBox: CollisionBox): Point {
+function generateNodeNE(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
   if (neighbours.NE) {
     return null
   }
   else {
     if (!neighbours.N && !neighbours.E) {
-      return {
+      return new PathNode({
         x: o.mapX + o.width + cBox.halfWidth,
         y: o.mapY - cBox.halfHeight,
-      }
+      })
     }
     if (neighbours.N && !neighbours.E) {
-      return {
+      return new PathNode({
         x: o.mapX + o.width + cBox.halfWidth,
         y: o.mapY,
-      }
+      })
     }
     if (!neighbours.N && neighbours.E) {
-      return {
+      return new PathNode({
         x: o.mapX + o.width,
         y: o.mapY - cBox.halfHeight,
-      }
+      })
     }
   }
 }
-function generateNodeSE(o: GameObject, neighbours: Directions, cBox: CollisionBox): Point {
+function generateNodeSE(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
   if (neighbours.SE) {
     return null
   }
   else {
     if (!neighbours.S && !neighbours.E) {
-      return {
+      return new PathNode({
         x: o.mapX + o.width  + cBox.halfWidth,
         y: o.mapY + o.height + cBox.halfHeight,
-      }
+      })
     }
     if (neighbours.S && !neighbours.E) {
-      return {
+      return new PathNode({
         x: o.mapX + o.width  + cBox.halfWidth,
         y: o.mapY + o.height,
-      }
+      })
     }
     if (!neighbours.S && neighbours.E) {
-      return {
+      return new PathNode({
         x: o.mapX + o.width,
         y: o.mapY + o.height + cBox.halfHeight,
-      }
+      })
     }
   }
 }
-function generateNodeSW(o: GameObject, neighbours: Directions, cBox: CollisionBox): Point {
+function generateNodeSW(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
   if (neighbours.SW) {
     return null
   }
   else {
     if (!neighbours.S && !neighbours.W) {
-      return {
+      return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY + o.height + cBox.halfHeight,
-      }
+      })
     }
     if (neighbours.S && !neighbours.W) {
-      return {
+      return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY + o.height,
-      }
+      })
     }
     if (!neighbours.S && neighbours.W) {
-      return {
+      return new PathNode({
         x: o.mapX,
         y: o.mapY + o.height + cBox.halfHeight,
-      }
+      })
     }
   }
 }
-function generateNodeNW(o: GameObject, neighbours: Directions, cBox: CollisionBox): Point {
+function generateNodeNW(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
   if (neighbours.NW) {
     return null
   }
   else {
     if (!neighbours.N && !neighbours.W) {
-      return {
+      return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY - cBox.halfHeight,
-      }
+      })
     }
     if (neighbours.N && !neighbours.W) {
-      return {
+      return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY,
-      }
+      })
     }
     if (!neighbours.N && neighbours.W) {
-      return {
+      return new PathNode({
         x: o.mapX,
         y: o.mapY - cBox.halfHeight,
-      }
+      })
     }
   }
 }
 
-export function drawPath(path: Point[], cBox: CollisionBox, player: Player, color: string) {
+export function drawPathNodes(path: PathNode[], cBox: CollisionBox, player: Player, color: string): void {
   if (path) {
     path.forEach(node => drawNode(node, cBox, player, color))
   }
 }
 
-function drawNode(node: Point, cBox: CollisionBox, player: Player, color: string): void {
+function drawNode(node: PathNode, cBox: CollisionBox, player: Player, color: string): void {
   context.strokeStyle = color
   context.lineWidth = 0.1
   context.beginPath()
@@ -219,4 +219,13 @@ function drawNode(node: Point, cBox: CollisionBox, player: Player, color: string
 
 export function findShortestPath(): void {
 
+}
+
+export class PathNode implements Point {
+  public x: number
+  public y: number
+  constructor(coordinates: Point) {
+    this.x = coordinates.x
+    this.y = coordinates.y
+  }
 }
