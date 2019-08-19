@@ -14,7 +14,7 @@ Run:
 make
 ```
 #### 2. Step
-Open index.html in your browser
+Serve the root directory and open index.html in your browser
 
 ## Check for TypeScript validity:
 
