@@ -1,8 +1,8 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import CollisionBox from '@app/infrastructure/CollisionBox'
-import Point from '@app/infrastructure/geometry/Point'
 import Player from '@app/domain/player/Player'
+import { PathNode } from '@app/infrastructure/Pathfinding'
 
 export default abstract class Enemy {
   public alive: boolean = true
@@ -28,7 +28,7 @@ export default abstract class Enemy {
 
   protected distanceFromPlayer: number
   protected thereAreObstaclesBetweenPlayerAndThisEnemy: boolean
-  protected pathToPlayer: Point[]
+  protected pathfindingNodes: PathNode[]
 
   constructor(
     public x: number,
@@ -46,9 +46,10 @@ export default abstract class Enemy {
   public abstract update(player: Player, enemies: Enemy[]): void
 
   public isOnScreen(playerX: number, playerY: number): boolean {
+    const offScreenOffset = CONFIG.TILE_SIZE * 2
     return (
-      Math.abs(this.x - playerX) < (CONFIG.CANVAS_WIDTH  / 2) + CONFIG.TILE_SIZE &&
-      Math.abs(this.y - playerY) < (CONFIG.CANVAS_HEIGHT / 2) + CONFIG.TILE_SIZE
+      Math.abs(this.x - playerX) < (CONFIG.CANVAS_WIDTH  / 2) + offScreenOffset &&
+      Math.abs(this.y - playerY) < (CONFIG.CANVAS_HEIGHT / 2) + offScreenOffset
     )
   }
 
@@ -104,6 +105,7 @@ export default abstract class Enemy {
     })
   }
 
+  // TODO: The color strings can be moved to a single hash map in order to optimize & localize the color searches
   protected getHealthColor(): string {
     if (this.health <= this.maxHealth * 0.10) {
       return '#FF5700'

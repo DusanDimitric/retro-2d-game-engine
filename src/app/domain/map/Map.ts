@@ -3,7 +3,7 @@ import * as CONFIG from '@app/configuration/config.json'
 import Grid from '@app/domain/Grid'
 
 import Player from '@app/domain/player/Player'
-import ConcreateEnemy from '@app/domain/enemies/ConcreteEnemy'
+import ConcreteEnemy from '@app/domain/enemies/ConcreteEnemy'
 import Enemy from '@app/domain/enemies/Enemy'
 import Canvas from '@app/infrastructure/Canvas'
 import GameObject from '@app/domain/objects/GameObject'
@@ -66,6 +66,6 @@ export default class Map {
       }
     }
 
-    map.enemies.forEach(e => enemies.push(new ConcreateEnemy(e.x, e.y, e.healthPercentage)))
+    map.enemies.forEach(e => enemies.push(new ConcreteEnemy(e.x, e.y, e.healthPercentage)))
   }
 }

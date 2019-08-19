@@ -16,7 +16,6 @@ export default class Raycaster {
    *   hitObject, // the game object that has been hit. If no object are hit - hitObject is `null`
    *   hitPoint   // can be either a point where the ray intersects a game object, or a just a point outside the screen if no object is hit
    * }
-   * // TODO: Make casting possible between any 2 arbitrary points, not just from 1 point to off-screen
    */
   public static cast(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
     if (theta >= 0) { // South

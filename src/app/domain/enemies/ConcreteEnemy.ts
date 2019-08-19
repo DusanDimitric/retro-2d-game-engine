@@ -3,16 +3,16 @@ import * as CONFIG from '@app/configuration/config.json'
 import SoundFX from '@app/audio/SoundFX'
 
 import Canvas, { context } from '@app/infrastructure/Canvas'
-import Point, { pointToPointDistance, angleBetweenPoints } from '@app/infrastructure/geometry/Point'
+import { pointToPointDistance, angleBetweenPoints } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Raycaster from '@app/infrastructure/Raycaster'
-import { generatePathNodes, drawPath } from '@app/infrastructure/Pathfinding'
+import { generatePathNodes, drawPathNodes } from '@app/infrastructure/Pathfinding'
 
 import { gameObjects } from '@app/domain/map/Map'
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
 
-export default class ConcreateEnemy extends Enemy {
+export default class ConcreteEnemy extends Enemy {
   constructor(
     x: number,
     y: number,
@@ -38,7 +38,7 @@ export default class ConcreateEnemy extends Enemy {
   public draw(player: Player): void {
     this.drawCollisionBox(player) // Just for debugging
     this.drawRayToPlayer(player) // TODO: Just for debugging
-    drawPath(this.pathToPlayer, this.collisionBox, player, this.getHealthColor()) // TODO: Just for debugging
+    drawPathNodes(this.pathfindingNodes, this.collisionBox, player, this.getHealthColor()) // TODO: Just for debugging
   }
 
   public takeDamage(damageAmount: number): void {
@@ -173,12 +173,12 @@ export default class ConcreateEnemy extends Enemy {
 
   private findPathToPlayer(player: Player): void {
     if (this.thereAreObstaclesBetweenPlayerAndThisEnemy) {
-      this.pathToPlayer = generatePathNodes(this.row, this.col, this.collisionBox)
+      this.pathfindingNodes = generatePathNodes(this.row, this.col, this.collisionBox)
       this.moveTowardsPlayer(player)
     }
     else {
-      if (this.pathToPlayer) {
-        this.pathToPlayer = null
+      if (this.pathfindingNodes) {
+        this.pathfindingNodes = null
       }
       this.moveTowardsPlayer(player)
     }
@@ -257,15 +257,18 @@ export default class ConcreateEnemy extends Enemy {
   }
 
   private determineIfThereAreObstaclesBetweenThisEnemyAndThePlayer(player: Player): void {
-    const angleBetweenPlayerAndEnemy = angleBetweenPoints(
-      { x: this.x,   y: this.y   },
-      { x: player.x, y: player.y }
-    )
-    const { hitPoint } = Raycaster.cast(player, angleBetweenPlayerAndEnemy)
+    // TODO: This needs to be done for each vertex of the enemy collision box instead of the center
+    // TODO: Return to this
+    // Vertex: NE
+    const angleBetweenEnemyAndPlayer = angleBetweenPoints(player, this)
+    const { hitPoint } = Raycaster.cast(this, angleBetweenEnemyAndPlayer, player)
     this.thereAreObstaclesBetweenPlayerAndThisEnemy = (
       this.distanceFromPlayer > pointToPointDistance(hitPoint, { x: 0, y: 0 })
     )
+    // if (this.thereAreObstaclesBetweenPlayerAndThisEnemy) { return }
 
+    // Vertex: NW
+    // Vertex: ...
   }
 
   // TODO: Compose this functionality since it's shared between enemies and player
