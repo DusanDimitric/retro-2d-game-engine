@@ -1,28 +1,14 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import CollisionBox from '@app/infrastructure/CollisionBox'
+import Creature from '@app/domain/Creature'
 import Player from '@app/domain/player/Player'
 import { PathNode } from '@app/infrastructure/Pathfinding'
 
-export default abstract class Enemy {
+export default abstract class Enemy extends Creature {
   public alive: boolean = true
   public maxHealth: number = 100
   public health: number
-
-  public moving = {
-    left  : false,
-    right : false,
-    up    : false,
-    down  : false,
-  }
-  public row: number
-  public col: number
-  public deltas = {
-    dyTop    : 0,
-    dyBottom : 0,
-    dxLeft   : 0,
-    dxRight  : 0,
-  }
 
   protected maxSpeedDiagonal: number
 
@@ -37,6 +23,7 @@ export default abstract class Enemy {
     protected maxSpeed: number,
     healthPercentage: number
   ) {
+    super()
     this.initializeHealth(healthPercentage)
 
     this.maxSpeedDiagonal = Math.round(Math.sin(45) * this.maxSpeed)
