@@ -75,7 +75,7 @@ export default abstract class Enemy extends Creature {
         } else if (this.y > e.y) {
           intersectionY = (e.y + e.collisionBox.halfHeight) - (this.y - this.collisionBox.halfHeight)
         }
-        if (!intersectionX || intersectionX > intersectionY) {
+        if (!intersectionX || intersectionX >= intersectionY) {
           if (this.y < e.y) {
             e.y += intersectionY
           } else {
