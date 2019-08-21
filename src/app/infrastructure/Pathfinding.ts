@@ -231,7 +231,7 @@ export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes:
 
   let nodeCurrent: PathNode
 
-  while (nodesNotTested.length > 0) {
+  while (nodesNotTested.length > 0 || nodeCurrent === nodeGoal) {
     nodesNotTested.sort((a: PathNode, b: PathNode) => a.g - b.g)
 
     while (nodesNotTested.length > 0 && nodesNotTested[0].visited === true) {
