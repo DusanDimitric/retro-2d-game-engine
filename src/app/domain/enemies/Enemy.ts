@@ -14,14 +14,17 @@ export default abstract class Enemy extends Creature {
 
   protected distanceFromPlayer: number
   protected thereAreObstaclesBetweenPlayerAndThisEnemy: boolean
+  protected pathfindingInterval: number = 0
+  protected pathfindingPeriod: number = 30
   protected pathfindingNodes: PathNode[]
+  protected shortestPath: PathNode[] = []
 
   constructor(
     public x: number,
     public y: number,
     public collisionBox: CollisionBox,
     protected maxSpeed: number,
-    healthPercentage: number
+    healthPercentage: number,
   ) {
     super()
     this.initializeHealth(healthPercentage)

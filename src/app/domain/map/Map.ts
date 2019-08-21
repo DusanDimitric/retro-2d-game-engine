@@ -66,6 +66,8 @@ export default class Map {
       }
     }
 
-    map.enemies.forEach(e => enemies.push(new ConcreteEnemy(e.x, e.y, e.healthPercentage)))
+    map.enemies.forEach((e, i) => {
+      enemies.push(new ConcreteEnemy(e.x, e.y, e.healthPercentage, i))
+    })
   }
 }

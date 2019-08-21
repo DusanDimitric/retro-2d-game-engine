@@ -1,6 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import Point from '@app/infrastructure/geometry/Point'
+import Point, { angleBetweenPoints } from '@app/infrastructure/geometry/Point'
 import GameObject from '@app/domain/objects/GameObject'
 import { gameObjects } from '@app/domain/map/Map'
 
@@ -53,6 +53,20 @@ export default class Raycaster {
       )
     context.stroke()
     context.lineWidth = 1
+  }
+
+  public static determineIfThereAreObstaclesBetweenTwoPoints(p1: Point, p2: Point): boolean {
+    const angleBetweenTwoGivenPoints = angleBetweenPoints(p2, p1)
+    const results = Raycaster.cast(p1, angleBetweenTwoGivenPoints, p2)
+
+    // I have to check if results exist because sometimes .cast() can return 'undefined'..
+    // Why .cast() sometimes returns 'undefined' could be worth investigating in the future..
+    if (results) {
+      return results.hitObject !== null
+    }
+    else {
+      return true
+    }
   }
 
   private static outsideOfScreenOffset = CONFIG.TILE_SIZE * 2

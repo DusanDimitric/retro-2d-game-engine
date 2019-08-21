@@ -1,9 +1,10 @@
 import * as CONFIG from '@app/configuration/config.json'
 
 import { Directions } from '@app/domain/Grid'
-import Point from '@app/infrastructure/geometry/Point'
+import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Canvas, { context } from '@app/infrastructure/Canvas'
+import Raycaster from './Raycaster'
 
 import { gameObjects } from '@app/domain/map/Map'
 import GameObject from '@app/domain/objects/GameObject'
@@ -193,7 +194,7 @@ export function drawPathNodes(path: PathNode[], cBox: CollisionBox, player: Play
   }
 }
 
-function drawNode(node: PathNode, cBox: CollisionBox, player: Player, color: string): void {
+export function drawNode(node: PathNode, cBox: CollisionBox, player: Player, color: string): void {
   context.strokeStyle = color
   context.lineWidth = 0.1
   context.beginPath()
@@ -217,15 +218,109 @@ function drawNode(node: PathNode, cBox: CollisionBox, player: Player, color: str
   context.stroke()
 }
 
-export function findShortestPath(): void {
+export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes: PathNode[]): PathNode[] {
+  const nodeGoal  = new PathNode(player)
+  const nodeStart = new PathNode(enemy)
 
+  pathfindingNodes.push(nodeGoal)
+
+  nodeStart.f = 0
+  nodeStart.g = nodeStart.heuristic(nodeGoal)
+
+  const nodesNotTested: PathNode[] = [ nodeStart ]
+
+  let nodeCurrent: PathNode
+
+  while (nodesNotTested.length > 0) {
+    nodesNotTested.sort((a: PathNode, b: PathNode) => a.g - b.g)
+
+    while (nodesNotTested.length > 0 && nodesNotTested[0].visited === true) {
+      nodesNotTested.shift()
+    }
+
+    if (nodesNotTested.length <= 0) {
+      break
+    }
+
+    nodeCurrent = nodesNotTested.shift()
+    nodeCurrent.visited = true
+
+    // Get neighbour nodes.
+    nodeCurrent.neighbourNodes = [ ...pathfindingNodes ]
+      .filter(node => {
+        return Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(nodeCurrent, node) === false
+      })
+
+    nodeCurrent.neighbourNodes
+      .map(node => {
+        if (node.visited === false) {
+          nodesNotTested.push(node)
+        }
+
+        // Calculate local goal
+        const possiblyLowerLocalGoal = nodeCurrent.f + pointToPointDistance(nodeCurrent, node)
+
+        if (possiblyLowerLocalGoal < node.f) {
+          node.parent = nodeCurrent
+          node.f = possiblyLowerLocalGoal
+          node.g = node.f + node.heuristic(nodeGoal)
+        }
+
+        return node
+      })
+  }
+
+  const path = []
+  if (nodeGoal.parent) {
+    let n: PathNode = nodeGoal
+    while (n.parent) {
+      path.push(n)
+      n = n.parent
+    }
+  }
+  return path
 }
 
 export class PathNode implements Point {
   public x: number
   public y: number
+  public row: number
+  public col: number
+  public deltas = {
+    dyTop    : 0,
+    dyBottom : 0,
+    dxLeft   : 0,
+    dxRight  : 0,
+  }
+
+  public visited: boolean = false
+  public g: number = Infinity // Global goal
+  public f: number = Infinity // Local goal
+  public parent: PathNode = null
+  public neighbourNodes: PathNode[]
+
   constructor(coordinates: Point) {
     this.x = coordinates.x
     this.y = coordinates.y
+    this.updateTileDeltas()
+    this.updateMapPosition()
+  }
+
+  public heuristic(nodeGoal: PathNode): number {
+    return pointToPointDistance(this, nodeGoal)
+  }
+
+  // TODO: Compose this functionality since it's shared between enemies and player
+  private updateTileDeltas(): void {
+    this.deltas.dyTop = this.y % CONFIG.TILE_SIZE
+    this.deltas.dyBottom = CONFIG.TILE_SIZE - this.deltas.dyTop
+    this.deltas.dxLeft = this.x % CONFIG.TILE_SIZE
+    this.deltas.dxRight = CONFIG.TILE_SIZE - this.deltas.dxLeft
+  }
+
+  // TODO: Not DRY... generalize this functionality
+  private updateMapPosition(): void {
+    this.row = Math.floor(this.y / CONFIG.TILE_SIZE)
+    this.col = Math.floor(this.x / CONFIG.TILE_SIZE)
   }
 }

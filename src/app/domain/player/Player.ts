@@ -189,6 +189,7 @@ export default class Player extends Creature {
     this.projectiles.forEach(p => p.draw(this.x, this.y))
   }
 
+  // TODO: Not DRY... generalize this functionality
   private updateMapPosition(): void {
     this.row = Math.floor(this.y / CONFIG.TILE_SIZE)
     this.col = Math.floor(this.x / CONFIG.TILE_SIZE)
