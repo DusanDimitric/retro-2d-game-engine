@@ -823,11 +823,17 @@ export default class Raycaster {
   }
   private static checkGameObjectCollisionHorizontalNE(i: number, p: Point, xIntercept: number): GameObject {
     const xTile = p.col + Math.floor((p.deltas.dxLeft + xIntercept) / CONFIG.TILE_SIZE)
+    const xTile_leftByOnePixel = p.col + Math.floor((p.deltas.dxLeft + xIntercept - 1) / CONFIG.TILE_SIZE)
     const yTile = p.row - i - 1
 
     let gameObjectHit = null
-    if (gameObjects[yTile] && gameObjects[yTile][xTile]) {
-      gameObjectHit = gameObjects[yTile][xTile]
+    if (gameObjects[yTile]) {
+      if (gameObjects[yTile][xTile]) {
+        gameObjectHit = gameObjects[yTile][xTile]
+      }
+      else if (gameObjects[yTile][xTile_leftByOnePixel]) {
+        gameObjectHit = gameObjects[yTile][xTile_leftByOnePixel]
+      }
     }
 
     if (CONFIG.RAYCASTER.DEBUG) {
