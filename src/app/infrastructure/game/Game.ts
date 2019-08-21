@@ -50,10 +50,7 @@ export default class Game {
 
   private gameLoop(): void {
     this.update()
-
-    if (FrameRate.nextFrameRenderingShouldBeSkipped() === false) {
-      this.render()
-    }
+    this.render()
 
     FrameRate.calculateFrameRate()
 
