@@ -20,7 +20,7 @@ export default class Player extends Creature {
   public rotation: number = 0
   public sightLineLength = 10
   public collisionBox: CollisionBox = new CollisionBox(12, 12)
-  private maxSpeed: number = 3
+  private maxSpeed: number = 2
   private maxSpeedDiagonal: number = Math.round(Math.sin(45) * this.maxSpeed)
   private shooting = false
   private shootingCooldown = 6
