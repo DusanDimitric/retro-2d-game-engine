@@ -772,10 +772,16 @@ export default class Raycaster {
   private static checkGameObjectCollisionVerticalSE(i: number, p: Point, yIntercept: number): GameObject {
     const xTile = 1 + p.col + i
     const yTile = p.row + Math.floor((p.deltas.dyTop + yIntercept) / CONFIG.TILE_SIZE)
+    const yTile_aboveByOnePixel = p.row + Math.floor((p.deltas.dyTop + yIntercept - 1) / CONFIG.TILE_SIZE)
 
     let gameObjectHit = null
-    if (gameObjects[yTile] && gameObjects[yTile][xTile]) {
-      gameObjectHit = gameObjects[yTile][xTile]
+    if (gameObjects[yTile]) {
+      if (gameObjects[yTile][xTile]) {
+        gameObjectHit = gameObjects[yTile][xTile]
+      }
+      else if (gameObjects[yTile_aboveByOnePixel][xTile]) {
+        gameObjectHit = gameObjects[yTile_aboveByOnePixel][xTile]
+      }
     }
 
     if (CONFIG.RAYCASTER.DEBUG) {
@@ -865,10 +871,16 @@ export default class Raycaster {
   private static checkGameObjectCollisionVerticalSW(i: number, p: Point, yIntercept: number): GameObject {
     const xTile = p.col - i - 1
     const yTile = p.row + Math.floor((p.deltas.dyTop + yIntercept) / CONFIG.TILE_SIZE)
+    const yTile_aboveByOnePixel = p.row + Math.floor((p.deltas.dyTop + yIntercept - 1) / CONFIG.TILE_SIZE)
 
     let gameObjectHit = null
-    if (gameObjects[yTile] && gameObjects[yTile][xTile]) {
-      gameObjectHit = gameObjects[yTile][xTile]
+    if (gameObjects[yTile]) {
+      if (gameObjects[yTile][xTile]) {
+        gameObjectHit = gameObjects[yTile][xTile]
+      }
+      else if (gameObjects[yTile_aboveByOnePixel][xTile]) {
+        gameObjectHit = gameObjects[yTile_aboveByOnePixel][xTile]
+      }
     }
 
     if (CONFIG.RAYCASTER.DEBUG) {
