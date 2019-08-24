@@ -4,6 +4,7 @@ import CollisionBox from '@app/infrastructure/CollisionBox'
 import Creature from '@app/domain/Creature'
 import Player from '@app/domain/player/Player'
 import { PathNode } from '@app/infrastructure/Pathfinding'
+import CreatureSprite from '@app/graphics/sprites/CreatureSprite'
 
 export default abstract class Enemy extends Creature {
   public alive: boolean = true
@@ -12,12 +13,16 @@ export default abstract class Enemy extends Creature {
 
   protected maxSpeedDiagonal: number
 
+  protected stuck: boolean
+
   protected distanceFromPlayer: number
   protected thereAreObstaclesBetweenPlayerAndThisEnemy: boolean
   protected pathfindingInterval: number = 0
   protected pathfindingPeriod: number = 30
   protected pathfindingNodes: PathNode[]
   protected shortestPath: PathNode[] = []
+
+  protected sprite: CreatureSprite
 
   constructor(
     public x: number,
@@ -53,6 +58,7 @@ export default abstract class Enemy extends Creature {
   }
 
   public abstract takeDamage(damageAmount: number): void
+  protected abstract advanceAnimation(): void
 
   protected collidesWithEnemy(enemyX: number, enemyY: number, enemyCollisionBox: CollisionBox): boolean {
     return (
@@ -93,6 +99,16 @@ export default abstract class Enemy extends Creature {
         }
       }
     })
+  }
+
+  protected checkIfStuck(): boolean {
+    const xIsStatic = this.prevX.every(x => x === this.prevX[0])
+    const yIsStatic = this.prevY.every(y => y === this.prevY[0])
+    if (xIsStatic && yIsStatic) {
+      return false
+    } else {
+      return true
+    }
   }
 
   // TODO: The color strings can be moved to a single hash map in order to optimize & localize the color searches

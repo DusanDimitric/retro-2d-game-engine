@@ -6,7 +6,7 @@ export default class Grid {
   public cols: number = CONFIG.CANVAS_WIDTH  / CONFIG.TILE_SIZE
 }
 
-export interface Directions {
+export interface NeighbourTiles {
     N  : (any | null)
     NE : (any | null)
     E  : (any | null)

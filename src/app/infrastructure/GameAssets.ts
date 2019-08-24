@@ -1,5 +1,6 @@
 
 enum GameAssets {
+  Graphics,
   Audio,
 }
 

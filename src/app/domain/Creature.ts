@@ -3,13 +3,20 @@ import * as CONFIG from '@app/configuration/config.json'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 
 import { gameObjects } from '@app/domain/map/Map'
+import { Directions } from '@app/infrastructure/Directions'
 
 export default abstract class Creature {
+  public prevX: number[] = [] // TODO: Make private?
+  public prevY: number[] = [] // TODO: Make private?
   public x: number
   public y: number
   public row: number
   public col: number
 
+  public animationInterval: number = 0
+
+  public direction: Directions
+  public isMoving: boolean = false
   public moving = {
     left  : false,
     right : false,
@@ -135,6 +142,49 @@ export default abstract class Creature {
           }
         }
       }
+    }
+  }
+
+  protected updatePreviousCoordinates(): void {
+    this.prevX.push(this.x)
+    if (this.prevX.length > 5) { this.prevX.shift() }
+
+    this.prevY.push(this.y)
+    if (this.prevY.length > 5) { this.prevY.shift() }
+  }
+
+  protected updateDirection(): void {
+    const direction: string[] = []
+
+    const dx = this.x - this.prevX[this.prevX.length - 1]
+    const dy = this.y - this.prevY[this.prevY.length - 1]
+
+    if (dy > 0) {
+      direction.push(Directions.S)
+    }
+    else if (dy < 0) {
+      direction.push(Directions.N)
+    }
+
+    if (dx > 0) {
+      direction.push(Directions.E)
+    }
+    else if (dx < 0) {
+      direction.push(Directions.W)
+    }
+
+    const directionString = direction.join('') || 'S'
+
+    this.direction = Directions[directionString as keyof typeof Directions]
+  }
+
+  protected checkIfMoving(): boolean {
+    const xUnchanged = this.prevX[this.prevX.length - 1] === this.prevX[this.prevX.length - 2]
+    const yUnchanged = this.prevY[this.prevY.length - 1] === this.prevY[this.prevY.length - 2]
+    if (xUnchanged && yUnchanged) {
+      return false
+    } else {
+      return true
     }
   }
 }

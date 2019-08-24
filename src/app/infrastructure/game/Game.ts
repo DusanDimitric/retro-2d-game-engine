@@ -1,4 +1,5 @@
 import AudioLoader from '@app/audio/AudioLoader'
+import GraphicsLoader from '@app/graphics/GraphicsLoader'
 import Canvas from '@app/infrastructure/Canvas'
 
 import FrameRate from '../FrameRate'
@@ -8,7 +9,8 @@ import GameAssets from '../GameAssets'
 
 export default class Game {
   public static loaded: boolean = false
-  public static loadedPercentage: number = 0.0 // 0.0 to 1.0
+  public static loadedPercentage: number = 0.0
+  public static loadedPercentages: Map<GameAssets, { loaded: number, weight: number }> = new Map()
 
   public static stateManager: GameStateManager = new GameStateManager()
 
@@ -24,7 +26,12 @@ export default class Game {
     window.onfocus = () => {
       FrameRate.restart()
     }
-    AudioLoader.load(percentage => this.gameAssetLoaded(GameAssets.Audio, percentage))
+
+    Game.loadedPercentages.set(GameAssets.Graphics, { weight: 0.3, loaded: 0.0 })
+    Game.loadedPercentages.set(GameAssets.Audio,    { weight: 0.7, loaded: 0.0 })
+
+    AudioLoader.load(   percentage => this.gameAssetLoaded(GameAssets.Audio, percentage))
+    GraphicsLoader.load(percentage => this.gameAssetLoaded(GameAssets.Graphics, percentage))
   }
 
   public start(): void {
@@ -39,10 +46,15 @@ export default class Game {
   }
 
   private gameAssetLoaded(asset: GameAssets, percentage: number) {
-    const audioWeight = 1.0 // TODO: Audio is 100% of all loaded assets for now
-    if (asset === GameAssets.Audio) {
-      Game.loadedPercentage = audioWeight * percentage
+    const assetValue = Game.loadedPercentages.get(asset)
+    assetValue.loaded = percentage
+    Game.loadedPercentages.set(asset, assetValue)
+
+    Game.loadedPercentage = 0
+    for (const [_key, value] of Game.loadedPercentages) {
+      Game.loadedPercentage += value.loaded * value.weight
     }
+
     if (Game.loadedPercentage === 1.0) {
       Game.loaded = true
     }

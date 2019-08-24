@@ -1,6 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import { Directions } from '@app/domain/Grid'
+import { NeighbourTiles } from '@app/domain/Grid'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Canvas, { context } from '@app/infrastructure/Canvas'
@@ -53,7 +53,7 @@ export function generatePathNodes(startRow: number, startCol: number, cBox: Coll
 }
 
 function generateNodesAroundGameObject(path: PathNode[], o: GameObject, cBox: CollisionBox): void {
-  const neighbours: Directions = {
+  const neighbours: NeighbourTiles = {
     N  : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col    ] : null,
     NE : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col + 1] : null,
     E  : gameObjects[o.row    ] ? gameObjects[o.row    ][o.col + 1] : null,
@@ -87,7 +87,7 @@ function generateNodesAroundGameObject(path: PathNode[], o: GameObject, cBox: Co
   if (nodeNW) { path.push(nodeNW) }
 }
 
-function generateNodeNE(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
+function generateNodeNE(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
   if (neighbours.NE) {
     return null
   }
@@ -112,7 +112,7 @@ function generateNodeNE(o: GameObject, neighbours: Directions, cBox: CollisionBo
     }
   }
 }
-function generateNodeSE(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
+function generateNodeSE(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
   if (neighbours.SE) {
     return null
   }
@@ -137,7 +137,7 @@ function generateNodeSE(o: GameObject, neighbours: Directions, cBox: CollisionBo
     }
   }
 }
-function generateNodeSW(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
+function generateNodeSW(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
   if (neighbours.SW) {
     return null
   }
@@ -162,7 +162,7 @@ function generateNodeSW(o: GameObject, neighbours: Directions, cBox: CollisionBo
     }
   }
 }
-function generateNodeNW(o: GameObject, neighbours: Directions, cBox: CollisionBox): PathNode {
+function generateNodeNW(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
   if (neighbours.NW) {
     return null
   }

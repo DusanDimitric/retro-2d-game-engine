@@ -212,6 +212,5 @@ export default class Player extends Creature {
 
   private die(): void {
     this.alive = false
-    Game.stateManager.setState(GAME_STATES.PAUSED)
   }
 }

@@ -2,6 +2,8 @@ import * as CONFIG from '@app/configuration/config.json'
 
 import SoundFX from '@app/audio/SoundFX'
 
+import Game from '@app/infrastructure/game/Game'
+import GAME_STATES from '@app/infrastructure/game/game_states/GameStates'
 import Canvas, { context } from '@app/infrastructure/Canvas'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
@@ -10,8 +12,11 @@ import { generatePathNodes, drawPathNodes, findShortestPath, drawNode } from '@a
 
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
+import CreatureSprite from '@app/graphics/sprites/CreatureSprite'
+import Sprites from '@app/graphics/Sprites'
 
 export default class ConcreteEnemy extends Enemy {
+  protected sprite: CreatureSprite = Sprites.Zerg
   constructor(
     x: number,
     y: number,
@@ -23,6 +28,11 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   public update(player: Player, enemies: Enemy[]): void {
+    this.updatePreviousCoordinates()
+
+    this.stuck    = this.checkIfStuck()
+    this.isMoving = this.checkIfMoving()
+
     this.adjustCollisionWithGameObjects()
     this.adjustCollisionWithOtherEnemies(enemies)
     this.distanceFromPlayer = pointToPointDistance(
@@ -32,8 +42,14 @@ export default class ConcreteEnemy extends Enemy {
     this.thereAreObstaclesBetweenPlayerAndThisEnemy =
       Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(this, player)
     this.findPathToPlayer(player)
+
     this.move()
+    this.updateDirection()
     this.updateTileDeltas()
+
+    if (Game.stateManager.getState() !== GAME_STATES.PAUSED) {
+      this.advanceAnimation()
+    }
   }
 
   public draw(player: Player): void {
@@ -49,6 +65,7 @@ export default class ConcreteEnemy extends Enemy {
     if (this.shortestPath.length > 0) {
       this.drawRayToPoint(this.shortestPath[this.shortestPath.length - 1], player)
     }
+    this.sprite.draw(this, { x: player.x, y: player.y })
   }
 
   public takeDamage(damageAmount: number): void {
@@ -64,6 +81,10 @@ export default class ConcreteEnemy extends Enemy {
   public die() {
     SoundFX.playEnemyDeath()
     this.alive = false
+  }
+
+  protected advanceAnimation(): void {
+    this.animationInterval = (this.animationInterval + 0.5) % this.sprite.animationPeriods.walking
   }
 
   private findPathToPlayer(player: Player): void {
@@ -98,8 +119,14 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   private moveTowardsPlayer(player: Player): void {
-    if (this.distanceFromPlayer > 1) {
+    if (this.distanceFromPlayer > this.collisionBox.width - 4) {
       this.moveTowards(player.x, player.y)
+    }
+    else {
+      this.moving.left  = false
+      this.moving.right = false
+      this.moving.up    = false
+      this.moving.down  = false
     }
   }
 
@@ -172,7 +199,7 @@ export default class ConcreteEnemy extends Enemy {
   // TODO: Compose this functionality since it's shared between enemies and player
   private drawCollisionBox(player: Player) {
     context.strokeStyle = this.getHealthColor()
-    context.lineWidth = 0.5
+    context.lineWidth = 0.2
     context.beginPath()
       // Since this is just for debugging purposes, there is no need to
       // optimize/cache the vertex calculations.

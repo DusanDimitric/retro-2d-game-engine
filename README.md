@@ -36,6 +36,10 @@ npx tsc -p tsconfig.json
 * BULLET HITS SOUND FX - by ActionVFX from https://www.actionvfx.com/collections/free-vfx/category
 * 5 Hit Sounds + Dying - By TinyWorlds from https://opengameart.org/content/5-hit-sounds-dying
 
+### Graphics
+
+* https://www.spriters-resource.com/pc_computer/starcraft/sheet/60003/
+
 ## Controls
 
 ### Keyboard
