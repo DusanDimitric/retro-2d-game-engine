@@ -60,7 +60,7 @@ export default class ConcreteEnemy extends Enemy {
     // TODO: Just for debugging
     this.shortestPath
       .forEach((n, i) => {
-        drawNode(n, this.collisionBox, player, n.visited ? '#FF0000' : '#FF00FF')
+        drawNode(n, player, n.visited ? '#FF0000' : '#FF00FF')
       })
     if (this.shortestPath.length > 0) {
       this.drawRayToPoint(this.shortestPath[this.shortestPath.length - 1], player)

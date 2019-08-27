@@ -10,6 +10,7 @@ import { gameObjects } from '@app/domain/map/Map'
 import GameObject from '@app/domain/objects/GameObject'
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
+import RaycastablePoint from './geometry/RaycastablePoint'
 
 /**
  *   o      o     o      o   o     o     o
@@ -96,19 +97,19 @@ function generateNodeNE(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
       return new PathNode({
         x: o.mapX + o.width + cBox.halfWidth,
         y: o.mapY - cBox.halfHeight,
-      })
+      }, cBox)
     }
     if (neighbours.N && !neighbours.E) {
       return new PathNode({
         x: o.mapX + o.width + cBox.halfWidth,
         y: o.mapY,
-      })
+      }, cBox)
     }
     if (!neighbours.N && neighbours.E) {
       return new PathNode({
         x: o.mapX + o.width,
         y: o.mapY - cBox.halfHeight,
-      })
+      }, cBox)
     }
   }
 }
@@ -121,19 +122,19 @@ function generateNodeSE(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
       return new PathNode({
         x: o.mapX + o.width  + cBox.halfWidth,
         y: o.mapY + o.height + cBox.halfHeight,
-      })
+      }, cBox)
     }
     if (neighbours.S && !neighbours.E) {
       return new PathNode({
         x: o.mapX + o.width  + cBox.halfWidth,
         y: o.mapY + o.height,
-      })
+      }, cBox)
     }
     if (!neighbours.S && neighbours.E) {
       return new PathNode({
         x: o.mapX + o.width,
         y: o.mapY + o.height + cBox.halfHeight,
-      })
+      }, cBox)
     }
   }
 }
@@ -146,19 +147,19 @@ function generateNodeSW(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
       return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY + o.height + cBox.halfHeight,
-      })
+      }, cBox)
     }
     if (neighbours.S && !neighbours.W) {
       return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY + o.height,
-      })
+      }, cBox)
     }
     if (!neighbours.S && neighbours.W) {
       return new PathNode({
         x: o.mapX,
         y: o.mapY + o.height + cBox.halfHeight,
-      })
+      }, cBox)
     }
   }
 }
@@ -171,40 +172,40 @@ function generateNodeNW(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
       return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY - cBox.halfHeight,
-      })
+      }, cBox)
     }
     if (neighbours.N && !neighbours.W) {
       return new PathNode({
         x: o.mapX - cBox.halfWidth,
         y: o.mapY,
-      })
+      }, cBox)
     }
     if (!neighbours.N && neighbours.W) {
       return new PathNode({
         x: o.mapX,
         y: o.mapY - cBox.halfHeight,
-      })
+      }, cBox)
     }
   }
 }
 
-export function drawPathNodes(path: PathNode[], cBox: CollisionBox, player: Player, color: string): void {
+export function drawPathNodes(path: PathNode[], player: Player, color: string): void {
   if (path) {
-    path.forEach(node => drawNode(node, cBox, player, color))
+    path.forEach(node => drawNode(node, player, color))
   }
 }
 
-export function drawNode(node: PathNode, cBox: CollisionBox, player: Player, color: string): void {
+export function drawNode(node: PathNode, player: Player, color: string): void {
   context.strokeStyle = color
   context.lineWidth = 0.1
   context.beginPath()
     // Since this is just for debugging purposes, there is no need to
     // optimize/cache the vertex calculations.
-    context.moveTo( 0.5 + Canvas.center.x + (node.x - player.x) - cBox.halfWidth,  0.5 + Canvas.center.y + (node.y - player.y) - cBox.halfHeight)
-    context.lineTo(-0.5 + Canvas.center.x + (node.x - player.x) + cBox.halfWidth,  0.5 + Canvas.center.y + (node.y - player.y) - cBox.halfHeight)
-    context.lineTo(-0.5 + Canvas.center.x + (node.x - player.x) + cBox.halfWidth, -0.5 + Canvas.center.y + (node.y - player.y) + cBox.halfHeight)
-    context.lineTo( 0.5 + Canvas.center.x + (node.x - player.x) - cBox.halfWidth, -0.5 + Canvas.center.y + (node.y - player.y) + cBox.halfHeight)
-    context.lineTo( 0.5 + Canvas.center.x + (node.x - player.x) - cBox.halfWidth,  0.5 + Canvas.center.y + (node.y - player.y) - cBox.halfHeight)
+    context.moveTo( 0.5 + Canvas.center.x + (node.x - player.x) - node.collisionBox.halfWidth,  0.5 + Canvas.center.y + (node.y - player.y) - node.collisionBox.halfHeight)
+    context.lineTo(-0.5 + Canvas.center.x + (node.x - player.x) + node.collisionBox.halfWidth,  0.5 + Canvas.center.y + (node.y - player.y) - node.collisionBox.halfHeight)
+    context.lineTo(-0.5 + Canvas.center.x + (node.x - player.x) + node.collisionBox.halfWidth, -0.5 + Canvas.center.y + (node.y - player.y) + node.collisionBox.halfHeight)
+    context.lineTo( 0.5 + Canvas.center.x + (node.x - player.x) - node.collisionBox.halfWidth, -0.5 + Canvas.center.y + (node.y - player.y) + node.collisionBox.halfHeight)
+    context.lineTo( 0.5 + Canvas.center.x + (node.x - player.x) - node.collisionBox.halfWidth,  0.5 + Canvas.center.y + (node.y - player.y) - node.collisionBox.halfHeight)
   context.stroke()
 
   context.beginPath()
@@ -219,8 +220,8 @@ export function drawNode(node: PathNode, cBox: CollisionBox, player: Player, col
 }
 
 export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes: PathNode[]): PathNode[] {
-  const nodeGoal  = new PathNode(player)
-  const nodeStart = new PathNode(enemy)
+  const nodeGoal  = new PathNode(player, player.collisionBox)
+  const nodeStart = new PathNode(enemy,  enemy.collisionBox)
 
   pathfindingNodes.push(nodeGoal)
 
@@ -281,7 +282,7 @@ export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes:
   return path
 }
 
-export class PathNode implements Point {
+export class PathNode implements RaycastablePoint {
   public x: number
   public y: number
   public row: number
@@ -292,6 +293,7 @@ export class PathNode implements Point {
     dxLeft   : 0,
     dxRight  : 0,
   }
+  public collisionBox: CollisionBox
 
   public visited: boolean = false
   public g: number = Infinity // Global goal
@@ -299,9 +301,10 @@ export class PathNode implements Point {
   public parent: PathNode = null
   public neighbourNodes: PathNode[]
 
-  constructor(coordinates: Point) {
+  constructor(coordinates: Point, cBox: CollisionBox) {
     this.x = coordinates.x
     this.y = coordinates.y
+    this.collisionBox = new CollisionBox(cBox.width + 2, cBox.height + 2)
     this.updateTileDeltas()
     this.updateMapPosition()
   }
