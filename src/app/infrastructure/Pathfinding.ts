@@ -12,6 +12,8 @@ import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
 import RaycastablePoint from './geometry/RaycastablePoint'
 
+const PATH_NODE_OFFSET = 2
+
 /**
  *   o      o     o      o   o     o     o
  *     ----         ----       ---- ----
@@ -65,16 +67,17 @@ function generateNodesAroundGameObject(path: PathNode[], o: GameObject, cBox: Co
     NW : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col - 1] : null,
   }
 
-  let nodeNE = generateNodeNE(o, neighbours, cBox)
-  let nodeSE = generateNodeSE(o, neighbours, cBox)
-  let nodeSW = generateNodeSW(o, neighbours, cBox)
-  let nodeNW = generateNodeNW(o, neighbours, cBox)
+  let nodeNE: PathNode = generateNodeNE(o, neighbours, cBox)
+  let nodeSE: PathNode = generateNodeSE(o, neighbours, cBox)
+  let nodeSW: PathNode = generateNodeSW(o, neighbours, cBox)
+  let nodeNW: PathNode = generateNodeNW(o, neighbours, cBox)
 
   if (nodeNE && (nodeNE.x < 0 || nodeNE.y < 0)) { nodeNE = null }
   if (nodeSE && (nodeSE.x < 0 || nodeSE.y < 0)) { nodeSE = null }
   if (nodeSW && (nodeSW.x < 0 || nodeSW.y < 0)) { nodeSW = null }
   if (nodeNW && (nodeNW.x < 0 || nodeNW.y < 0)) { nodeNW = null }
 
+  // Don't allow duplicate PathNodes
   path.forEach(node => {
     if (nodeNE && (node.x === nodeNE.x && node.y === nodeNE.y)) { nodeNE = null }
     if (nodeSE && (node.x === nodeSE.x && node.y === nodeSE.y)) { nodeSE = null }
@@ -95,20 +98,20 @@ function generateNodeNE(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
   else {
     if (!neighbours.N && !neighbours.E) {
       return new PathNode({
-        x: o.mapX + o.width + cBox.halfWidth,
-        y: o.mapY - cBox.halfHeight,
+        x:  PATH_NODE_OFFSET + o.mapX + o.width + cBox.halfWidth,
+        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
       }, cBox)
     }
     if (neighbours.N && !neighbours.E) {
       return new PathNode({
-        x: o.mapX + o.width + cBox.halfWidth,
+        x: PATH_NODE_OFFSET + o.mapX + o.width + cBox.halfWidth,
         y: o.mapY,
       }, cBox)
     }
     if (!neighbours.N && neighbours.E) {
       return new PathNode({
         x: o.mapX + o.width,
-        y: o.mapY - cBox.halfHeight,
+        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
       }, cBox)
     }
   }
@@ -120,20 +123,20 @@ function generateNodeSE(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
   else {
     if (!neighbours.S && !neighbours.E) {
       return new PathNode({
-        x: o.mapX + o.width  + cBox.halfWidth,
-        y: o.mapY + o.height + cBox.halfHeight,
+        x: PATH_NODE_OFFSET + o.mapX + o.width  + cBox.halfWidth,
+        y: PATH_NODE_OFFSET +o.mapY + o.height + cBox.halfHeight,
       }, cBox)
     }
     if (neighbours.S && !neighbours.E) {
       return new PathNode({
-        x: o.mapX + o.width  + cBox.halfWidth,
+        x: PATH_NODE_OFFSET + o.mapX + o.width  + cBox.halfWidth,
         y: o.mapY + o.height,
       }, cBox)
     }
     if (!neighbours.S && neighbours.E) {
       return new PathNode({
         x: o.mapX + o.width,
-        y: o.mapY + o.height + cBox.halfHeight,
+        y: PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
       }, cBox)
     }
   }
@@ -145,20 +148,20 @@ function generateNodeSW(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
   else {
     if (!neighbours.S && !neighbours.W) {
       return new PathNode({
-        x: o.mapX - cBox.halfWidth,
-        y: o.mapY + o.height + cBox.halfHeight,
+        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
+        y:  PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
       }, cBox)
     }
     if (neighbours.S && !neighbours.W) {
       return new PathNode({
-        x: o.mapX - cBox.halfWidth,
+        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
         y: o.mapY + o.height,
       }, cBox)
     }
     if (!neighbours.S && neighbours.W) {
       return new PathNode({
         x: o.mapX,
-        y: o.mapY + o.height + cBox.halfHeight,
+        y: PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
       }, cBox)
     }
   }
@@ -170,20 +173,20 @@ function generateNodeNW(o: GameObject, neighbours: NeighbourTiles, cBox: Collisi
   else {
     if (!neighbours.N && !neighbours.W) {
       return new PathNode({
-        x: o.mapX - cBox.halfWidth,
-        y: o.mapY - cBox.halfHeight,
+        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
+        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
       }, cBox)
     }
     if (neighbours.N && !neighbours.W) {
       return new PathNode({
-        x: o.mapX - cBox.halfWidth,
+        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
         y: o.mapY,
       }, cBox)
     }
     if (!neighbours.N && neighbours.W) {
       return new PathNode({
         x: o.mapX,
-        y: o.mapY - cBox.halfHeight,
+        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
       }, cBox)
     }
   }
@@ -304,7 +307,7 @@ export class PathNode implements RaycastablePoint {
   constructor(coordinates: Point, cBox: CollisionBox) {
     this.x = coordinates.x
     this.y = coordinates.y
-    this.collisionBox = new CollisionBox(cBox.width + 2, cBox.height + 2)
+    this.collisionBox = new CollisionBox(cBox.width, cBox.height)
     this.updateTileDeltas()
     this.updateMapPosition()
   }
