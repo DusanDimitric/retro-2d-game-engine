@@ -5,7 +5,7 @@ import SoundFX from '@app/audio/SoundFX'
 import Game from '@app/infrastructure/game/Game'
 import GAME_STATES from '@app/infrastructure/game/game_states/GameStates'
 import Canvas, { context } from '@app/infrastructure/Canvas'
-import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
+import Point, { pointToPointDistance, angleBetweenPoints } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Raycaster from '@app/infrastructure/Raycaster'
 import { generatePathNodes, drawPathNodes, findShortestPath, drawNode } from '@app/infrastructure/Pathfinding'
@@ -40,7 +40,7 @@ export default class ConcreteEnemy extends Enemy {
       { x: this.x,   y: this.y   }
     )
     this.thereAreObstaclesBetweenPlayerAndThisEnemy =
-      Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(this, player)
+      Raycaster.determineIfThereAreObstaclesBetweenTwoPathNodes(this, player)
     this.findPathToPlayer(player)
 
     this.move()
@@ -54,8 +54,7 @@ export default class ConcreteEnemy extends Enemy {
 
   public draw(player: Player): void {
     this.drawCollisionBox(player) // Just for debugging
-    // this.drawRayToPlayer(player) // TODO: Just for debugging
-    // drawPathNodes(this.pathfindingNodes, this.collisionBox, player, this.getHealthColor()) // TODO: Just for debugging
+    // drawPathNodes(this.pathfindingNodes, player, this.getHealthColor()) // TODO: Just for debugging
 
     // TODO: Just for debugging
     this.shortestPath
@@ -64,6 +63,7 @@ export default class ConcreteEnemy extends Enemy {
       })
     if (this.shortestPath.length > 0) {
       this.drawRayToPoint(this.shortestPath[this.shortestPath.length - 1], player)
+      this.shortestPath.forEach(node => this.drawRayToPoint(node, player)) // Draw all lines
     }
     this.sprite.draw(this, { x: player.x, y: player.y })
   }
@@ -119,7 +119,7 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   private moveTowardsPlayer(player: Player): void {
-    if (this.distanceFromPlayer > this.collisionBox.width - 4) {
+    if (this.distanceFromPlayer > this.collisionBox.width - 2) {
       this.moveTowards(player.x, player.y)
     }
     else {
@@ -147,37 +147,19 @@ export default class ConcreteEnemy extends Enemy {
     else if (this.y > y) {
       this.moving.up = true
     }
+
+    this.angleBetweenThisEnemyAndPlayer = +(angleBetweenPoints({ x, y }, this).toFixed(2))
+    this.speed[0] = Math.round(Math.cos(this.angleBetweenThisEnemyAndPlayer)) * this.maxSpeed
+    this.speed[1] = Math.round(Math.sin(this.angleBetweenThisEnemyAndPlayer)) * this.maxSpeed
   }
 
   // TODO: Compose this functionality since it's shared between enemies and player
   private move(): void {
-    if (this.moving.left) {
-      if (this.moving.up || this.moving.down) {
-        this.x -= this.maxSpeedDiagonal
-      } else {
-        this.x -= this.maxSpeed
-      }
+    if (this.moving.left || this.moving.right) {
+      this.x += this.speed[0]
     }
-    if (this.moving.right) {
-      if (this.moving.up || this.moving.down) {
-        this.x += this.maxSpeedDiagonal
-      } else {
-        this.x += this.maxSpeed
-      }
-    }
-    if (this.moving.up) {
-      if (this.moving.left || this.moving.right) {
-        this.y -= this.maxSpeedDiagonal
-      } else {
-        this.y -= this.maxSpeed
-      }
-    }
-    if (this.moving.down) {
-      if (this.moving.left || this.moving.right) {
-        this.y += this.maxSpeedDiagonal
-      } else {
-        this.y += this.maxSpeed
-      }
+    if (this.moving.up || this.moving.down) {
+      this.y += this.speed[1]
     }
     this.updateMapPosition()
   }
@@ -208,20 +190,6 @@ export default class ConcreteEnemy extends Enemy {
       context.lineTo(-0.5 + Canvas.center.x + (this.x - player.x) + this.collisionBox.halfWidth, -0.5 + Canvas.center.y + (this.y - player.y) + this.collisionBox.halfHeight)
       context.lineTo( 0.5 + Canvas.center.x + (this.x - player.x) - this.collisionBox.halfWidth, -0.5 + Canvas.center.y + (this.y - player.y) + this.collisionBox.halfHeight)
       context.lineTo( 0.5 + Canvas.center.x + (this.x - player.x) - this.collisionBox.halfWidth,  0.5 + Canvas.center.y + (this.y - player.y) - this.collisionBox.halfHeight)
-    context.stroke()
-  }
-
-  // TODO: Just for debugging
-  private drawRayToPlayer(player: Player) {
-    if (this.thereAreObstaclesBetweenPlayerAndThisEnemy) {
-      context.strokeStyle = '#FFFF44'
-    } else {
-      context.strokeStyle = '#00F0FF'
-    }
-    context.lineWidth = 0.5
-    context.beginPath()
-      context.moveTo(Canvas.center.x + (this.x - player.x), Canvas.center.y + (this.y - player.y))
-      context.lineTo(Canvas.center.x, Canvas.center.y)
     context.stroke()
   }
 

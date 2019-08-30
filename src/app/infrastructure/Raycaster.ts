@@ -1,10 +1,14 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import Point, { angleBetweenPoints } from '@app/infrastructure/geometry/Point'
+import Point, { angleBetweenPoints, updatePointRowAndColValues, updatePointDeltas } from '@app/infrastructure/geometry/Point'
 import GameObject from '@app/domain/objects/GameObject'
 import { gameObjects } from '@app/domain/map/Map'
 
 import Canvas, { context } from '@app/infrastructure/Canvas'
+import RaycastablePoint from './geometry/RaycastablePoint'
+import Enemy from '@app/domain/enemies/Enemy'
+import { PathNode } from './Pathfinding'
+import Player from '@app/domain/player/Player'
 
 export default class Raycaster {
   /**
@@ -17,7 +21,11 @@ export default class Raycaster {
    *   hitPoint   // can be either a point where the ray intersects a game object, or a just a point outside the screen if no object is hit
    * }
    */
-  public static cast(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
+  public static cast(
+    p: RaycastablePoint,
+    theta: number,
+    pEnd?: RaycastablePoint
+  ): { hitPoint: Point, hitObject: GameObject } {
     if (theta >= 0) { // South
       const xInt = p.deltas.dyBottom / Math.tan(theta)
 
@@ -55,7 +63,7 @@ export default class Raycaster {
     context.lineWidth = 1
   }
 
-  public static determineIfThereAreObstaclesBetweenTwoPoints(p1: Point, p2: Point): boolean {
+  public static determineIfThereAreObstaclesBetweenTwoPoints(p1: RaycastablePoint, p2: RaycastablePoint): boolean {
     const angleBetweenTwoGivenPoints = angleBetweenPoints(p2, p1)
     const results = Raycaster.cast(p1, angleBetweenTwoGivenPoints, p2)
 
@@ -69,12 +77,113 @@ export default class Raycaster {
     }
   }
 
+  // This function is very computationaly expensive, see if it can be optimized
+  public static determineIfThereAreObstaclesBetweenTwoPathNodes(n1: PathNode | Enemy, n2: PathNode | Player) {
+    const angleBetweenNodes: number = +angleBetweenPoints(n2, n1).toFixed(2)
+
+    if (angleBetweenNodes === 0) { // 0deg
+      const [vNE1, vNE2] = getVerticesNE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNE1 as RaycastablePoint, vNE2 as RaycastablePoint)) {
+        return true
+      }
+      const [vSE1, vSE2] = getVerticesSE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSE1 as RaycastablePoint, vSE2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+
+    else if (angleBetweenNodes > 0 && angleBetweenNodes < Math.PI / 2) { // between 0deg and 90deg
+      const [vNE1, vNE2] = getVerticesNE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNE1 as RaycastablePoint, vNE2 as RaycastablePoint)) {
+        return true
+      }
+      const [vSW1, vSW2] = getVerticesSW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSW1 as RaycastablePoint, vSW2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+
+    else if (angleBetweenNodes === (Math.PI / 2)) { // 90deg
+      const [vSE1, vSE2] = getVerticesSE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSE1 as RaycastablePoint, vSE2 as RaycastablePoint)) {
+        return true
+      }
+      const [vSW1, vSW2] = getVerticesSW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSW1 as RaycastablePoint, vSW2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+
+    else if (angleBetweenNodes > Math.PI / 2 && angleBetweenNodes < Math.PI) { // between 90deg and 180deg
+      const [vNW1, vNW2] = getVerticesNW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNW1 as RaycastablePoint, vNW2 as RaycastablePoint)) {
+        return true
+      }
+      const [vSE1, vSE2] = getVerticesSE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSE1 as RaycastablePoint, vSE2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+
+    else if (Math.abs(angleBetweenNodes) === 3.14) { // 180deg
+      const [vNW1, vNW2] = getVerticesNW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNW1 as RaycastablePoint, vNW2 as RaycastablePoint)) {
+        return true
+      }
+      const [vSW1, vSW2] = getVerticesSW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSW1 as RaycastablePoint, vSW2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+
+    else if (angleBetweenNodes > -Math.PI && angleBetweenNodes < -Math.PI / 2) { // between 180deg and 270deg
+      const [vNE1, vNE2] = getVerticesNE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNE1 as RaycastablePoint, vNE2 as RaycastablePoint)) {
+        return true
+      }
+      const [vSW1, vSW2] = getVerticesSW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSW1 as RaycastablePoint, vSW2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+
+    else if (angleBetweenNodes === -1.57) { // 270deg
+      const [vNE1, vNE2] = getVerticesNE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNE1 as RaycastablePoint, vNE2 as RaycastablePoint)) {
+        return true
+      }
+      const [vNW1, vNW2] = getVerticesNW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNW1 as RaycastablePoint, vNW2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+
+    else if (angleBetweenNodes > -Math.PI / 2 && angleBetweenNodes < 0) { // between 270deg and 360deg
+      const [vNW1, vNW2] = getVerticesNW(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vNW1 as RaycastablePoint, vNW2 as RaycastablePoint)) {
+        return true
+      }
+      const [vSE1, vSE2] = getVerticesSE(n1, n2)
+      if (Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(vSE1 as RaycastablePoint, vSE2 as RaycastablePoint)) {
+        return true
+      }
+      return false
+    }
+  }
+
   private static outsideOfScreenOffset = CONFIG.TILE_SIZE * 2
   private static rangeHorizontal: number = Canvas.halfWidth  + Raycaster.outsideOfScreenOffset
   private static rangeVertical: number   = Canvas.halfHeight + Raycaster.outsideOfScreenOffset
 
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointSE(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointSE(p: RaycastablePoint, theta: number, pEnd?: RaycastablePoint): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -248,7 +357,7 @@ export default class Raycaster {
   }
 
   // TODO: This is a naive implementation! Add 6x optimization
-  private static getInterceptPointNE(p: Point, theta: number, pEnd?: Point): { hitPoint: Point, hitObject: GameObject } {
+  private static getInterceptPointNE(p: RaycastablePoint, theta: number, pEnd?: RaycastablePoint): { hitPoint: Point, hitObject: GameObject } {
     // ########################################################################
     // Vertical Intercepts
     // ########################################################################
@@ -910,4 +1019,109 @@ export default class Raycaster {
 
     return gameObjectHit
   }
+}
+
+const blankVertex: Point = {
+  x: 0,
+  y: 0,
+  deltas: {
+    dyTop    : 0,
+    dyBottom : 0,
+    dxLeft   : 0,
+    dxRight  : 0,
+  },
+}
+const vertexNW1: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+const vertexNW2: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+const vertexNE1: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+const vertexNE2: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+const vertexSW1: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+const vertexSW2: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+const vertexSE1: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+const vertexSE2: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
+
+function getVerticesNW(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
+  vertexNW1.x = n1.x - n1.collisionBox.halfWidth
+  vertexNW1.y = n1.y - n1.collisionBox.halfHeight
+  vertexNW1.deltas.dyTop = n1.deltas.dyTop
+  vertexNW1.deltas.dyBottom = n1.deltas.dyBottom
+  vertexNW1.deltas.dxLeft = n1.deltas.dxLeft
+  vertexNW1.deltas.dxRight = n1.deltas.dxRight
+  updatePointRowAndColValues(vertexNW1)
+  updatePointDeltas(vertexNW1)
+
+  vertexNW2.x = n2.x - n2.collisionBox.halfWidth
+  vertexNW2.y = n2.y - n2.collisionBox.halfHeight
+  vertexNW2.deltas.dyTop = n2.deltas.dyTop
+  vertexNW2.deltas.dxRight = n2.deltas.dxRight
+  vertexNW2.deltas.dxLeft = n2.deltas.dxLeft
+  vertexNW2.deltas.dyBottom = n2.deltas.dyBottom
+  updatePointRowAndColValues(vertexNW2)
+  updatePointDeltas(vertexNW2)
+
+  return [ vertexNW1, vertexNW2 ]
+}
+
+function getVerticesNE(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
+  vertexNE1.x = n1.x + n1.collisionBox.halfWidth
+  vertexNE1.y = n1.y - n1.collisionBox.halfHeight
+  vertexNE1.deltas.dyTop = n1.deltas.dyTop
+  vertexNE1.deltas.dxRight = n1.deltas.dxRight
+  vertexNE1.deltas.dxLeft = n1.deltas.dxLeft
+  vertexNE1.deltas.dyBottom = n1.deltas.dyBottom
+  updatePointRowAndColValues(vertexNE1)
+  updatePointDeltas(vertexNE1)
+
+  vertexNE2.x = n2.x + n2.collisionBox.halfWidth
+  vertexNE2.y = n2.y - n2.collisionBox.halfHeight
+  vertexNE2.deltas.dyTop = n2.deltas.dyTop
+  vertexNE2.deltas.dxRight = n2.deltas.dxRight
+  vertexNE2.deltas.dxLeft = n2.deltas.dxLeft
+  vertexNE2.deltas.dyBottom = n2.deltas.dyBottom
+  updatePointRowAndColValues(vertexNE2)
+  updatePointDeltas(vertexNE2)
+
+  return [ vertexNE1, vertexNE2 ]
+}
+
+function getVerticesSW(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
+  vertexSW1.x = n1.x - n1.collisionBox.halfWidth
+  vertexSW1.y = n1.y + n1.collisionBox.halfHeight
+  vertexSW1.deltas.dyTop = n1.deltas.dyTop
+  vertexSW1.deltas.dxRight = n1.deltas.dxRight
+  vertexSW1.deltas.dxLeft = n1.deltas.dxLeft
+  vertexSW1.deltas.dyBottom = n1.deltas.dyBottom
+  updatePointRowAndColValues(vertexSW1)
+  updatePointDeltas(vertexSW1)
+
+  vertexSW2.x = n2.x - n2.collisionBox.halfWidth
+  vertexSW2.y = n2.y + n2.collisionBox.halfHeight
+  vertexSW2.deltas.dyTop = n2.deltas.dyTop
+  vertexSW2.deltas.dxRight = n2.deltas.dxRight
+  vertexSW2.deltas.dxLeft = n2.deltas.dxLeft
+  vertexSW2.deltas.dyBottom = n2.deltas.dyBottom
+  updatePointRowAndColValues(vertexSW2)
+  updatePointDeltas(vertexSW2)
+  return [ vertexSW1, vertexSW2 ]
+}
+
+function getVerticesSE(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
+  vertexSE1.x = n1.x + n1.collisionBox.halfWidth
+  vertexSE1.y = n1.y + n1.collisionBox.halfHeight
+  vertexSE1.deltas.dyTop = n1.deltas.dyTop
+  vertexSE1.deltas.dxRight = n1.deltas.dxRight
+  vertexSE1.deltas.dxLeft = n1.deltas.dxLeft
+  vertexSE1.deltas.dyBottom = n1.deltas.dyBottom
+  updatePointRowAndColValues(vertexSE1)
+  updatePointDeltas(vertexSE1)
+
+  vertexSE2.x = n2.x + n2.collisionBox.halfWidth
+  vertexSE2.y = n2.y + n2.collisionBox.halfHeight
+  vertexSE2.deltas.dyTop = n2.deltas.dyTop
+  vertexSE2.deltas.dxRight = n2.deltas.dxRight
+  vertexSE2.deltas.dxLeft = n2.deltas.dxLeft
+  vertexSE2.deltas.dyBottom = n2.deltas.dyBottom
+  updatePointRowAndColValues(vertexSE2)
+  updatePointDeltas(vertexSE2)
+  return [ vertexSE1, vertexSE2 ]
 }

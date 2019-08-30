@@ -252,7 +252,7 @@ export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes:
     // Get neighbour nodes.
     nodeCurrent.neighbourNodes = [ ...pathfindingNodes ]
       .filter(node => {
-        return Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(nodeCurrent, node) === false
+        return Raycaster.determineIfThereAreObstaclesBetweenTwoPathNodes(nodeCurrent, node) === false
       })
 
     nodeCurrent.neighbourNodes

@@ -11,7 +11,8 @@ export default abstract class Enemy extends Creature {
   public maxHealth: number = 100
   public health: number
 
-  protected maxSpeedDiagonal: number
+  protected angleBetweenThisEnemyAndPlayer: number = 0.0
+  protected speed: [number, number] = [ 0, 0 ] // [ x, y ]
 
   protected stuck: boolean
 
@@ -33,8 +34,6 @@ export default abstract class Enemy extends Creature {
   ) {
     super()
     this.initializeHealth(healthPercentage)
-
-    this.maxSpeedDiagonal = Math.round(Math.sin(45) * this.maxSpeed)
   }
 
   public abstract draw(player: Player): void
