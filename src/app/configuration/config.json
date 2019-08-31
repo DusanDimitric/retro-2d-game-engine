@@ -5,5 +5,6 @@
   "SCALE": 2,
   "RAYCASTER": {
     "DEBUG": false
-  }
+  },
+  "THROW_DEVELOPMENT_ERRORS": true
 }

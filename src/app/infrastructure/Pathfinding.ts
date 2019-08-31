@@ -14,24 +14,6 @@ import RaycastablePoint from './geometry/RaycastablePoint'
 
 const PATH_NODE_OFFSET = 2
 
-/**
- *   o      o     o      o   o     o     o
- *     ----         ----       ---- ----
- *    |    |       |    |     |    |    |
- *     ----       o ---- o     ---- ----
- *   o      o      |    |    o     o     o
- *                  ----
- *                o      o
- *
- *      o     o     o          o      o
- *        ---- ----              ----
- *       |    |    |      o   o |    |
- *      o ---- ---- o       ---- ----
- *       |    | o          |    | o   o
- *        ----              ----
- *      o      o          o      o
- */
-// TODO: cache path nodes for same collision box dimensions || don't generate path nodes every frame
 export function generatePathNodes(startRow: number, startCol: number, cBox: CollisionBox): PathNode[] {
   const path: PathNode[] = []
 
@@ -47,150 +29,20 @@ export function generatePathNodes(startRow: number, startCol: number, cBox: Coll
 
   for (let row = rowStart; row < rowEnd; ++row) {
     for (let col = colStart - 1; col < colEnd; ++col) {
-      if (!gameObjects[row] || !gameObjects[row][col]) { continue }
-      generateNodesAroundGameObject(path, gameObjects[row][col], cBox)
+      if (!gameObjects[row] || !gameObjects[row][col]) {
+        if (col > 0 && row > 0) {
+          path.push(new PathNode({
+            x: col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
+            y: row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
+          }, cBox))
+        }
+      }
     }
   }
 
   return path
 }
 
-function generateNodesAroundGameObject(path: PathNode[], o: GameObject, cBox: CollisionBox): void {
-  const neighbours: NeighbourTiles = {
-    N  : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col    ] : null,
-    NE : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col + 1] : null,
-    E  : gameObjects[o.row    ] ? gameObjects[o.row    ][o.col + 1] : null,
-    SE : gameObjects[o.row + 1] ? gameObjects[o.row + 1][o.col + 1] : null,
-    S  : gameObjects[o.row + 1] ? gameObjects[o.row + 1][o.col    ] : null,
-    SW : gameObjects[o.row + 1] ? gameObjects[o.row + 1][o.col - 1] : null,
-    W  : gameObjects[o.row    ] ? gameObjects[o.row    ][o.col - 1] : null,
-    NW : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col - 1] : null,
-  }
-
-  let nodeNE: PathNode = generateNodeNE(o, neighbours, cBox)
-  let nodeSE: PathNode = generateNodeSE(o, neighbours, cBox)
-  let nodeSW: PathNode = generateNodeSW(o, neighbours, cBox)
-  let nodeNW: PathNode = generateNodeNW(o, neighbours, cBox)
-
-  if (nodeNE && (nodeNE.x < 0 || nodeNE.y < 0)) { nodeNE = null }
-  if (nodeSE && (nodeSE.x < 0 || nodeSE.y < 0)) { nodeSE = null }
-  if (nodeSW && (nodeSW.x < 0 || nodeSW.y < 0)) { nodeSW = null }
-  if (nodeNW && (nodeNW.x < 0 || nodeNW.y < 0)) { nodeNW = null }
-
-  // Don't allow duplicate PathNodes
-  path.forEach(node => {
-    if (nodeNE && (node.x === nodeNE.x && node.y === nodeNE.y)) { nodeNE = null }
-    if (nodeSE && (node.x === nodeSE.x && node.y === nodeSE.y)) { nodeSE = null }
-    if (nodeSW && (node.x === nodeSW.x && node.y === nodeSW.y)) { nodeSW = null }
-    if (nodeNW && (node.x === nodeNW.x && node.y === nodeNW.y)) { nodeNW = null }
-  })
-
-  if (nodeNE) { path.push(nodeNE) }
-  if (nodeSE) { path.push(nodeSE) }
-  if (nodeSW) { path.push(nodeSW) }
-  if (nodeNW) { path.push(nodeNW) }
-}
-
-function generateNodeNE(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.NE) {
-    return null
-  }
-  else {
-    if (!neighbours.N && !neighbours.E) {
-      return new PathNode({
-        x:  PATH_NODE_OFFSET + o.mapX + o.width + cBox.halfWidth,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.N && !neighbours.E) {
-      return new PathNode({
-        x: PATH_NODE_OFFSET + o.mapX + o.width + cBox.halfWidth,
-        y: o.mapY,
-      }, cBox)
-    }
-    if (!neighbours.N && neighbours.E) {
-      return new PathNode({
-        x: o.mapX + o.width,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-  }
-}
-function generateNodeSE(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.SE) {
-    return null
-  }
-  else {
-    if (!neighbours.S && !neighbours.E) {
-      return new PathNode({
-        x: PATH_NODE_OFFSET + o.mapX + o.width  + cBox.halfWidth,
-        y: PATH_NODE_OFFSET +o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.S && !neighbours.E) {
-      return new PathNode({
-        x: PATH_NODE_OFFSET + o.mapX + o.width  + cBox.halfWidth,
-        y: o.mapY + o.height,
-      }, cBox)
-    }
-    if (!neighbours.S && neighbours.E) {
-      return new PathNode({
-        x: o.mapX + o.width,
-        y: PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-  }
-}
-function generateNodeSW(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.SW) {
-    return null
-  }
-  else {
-    if (!neighbours.S && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y:  PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.S && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y: o.mapY + o.height,
-      }, cBox)
-    }
-    if (!neighbours.S && neighbours.W) {
-      return new PathNode({
-        x: o.mapX,
-        y: PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-  }
-}
-function generateNodeNW(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.NW) {
-    return null
-  }
-  else {
-    if (!neighbours.N && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.N && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y: o.mapY,
-      }, cBox)
-    }
-    if (!neighbours.N && neighbours.W) {
-      return new PathNode({
-        x: o.mapX,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-  }
-}
 
 export function drawPathNodes(path: PathNode[], player: Player, color: string): void {
   if (path) {
@@ -252,7 +104,41 @@ export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes:
     // Get neighbour nodes.
     nodeCurrent.neighbourNodes = [ ...pathfindingNodes ]
       .filter(node => {
-        return Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(nodeCurrent, node) === false
+        return (
+          (node.col === nodeCurrent.col     && node.row === nodeCurrent.row    ) || // Center
+          (node.col === nodeCurrent.col     && node.row === nodeCurrent.row - 1) || // N
+          (node.col === nodeCurrent.col + 1 && node.row === nodeCurrent.row    ) || // E
+          (node.col === nodeCurrent.col     && node.row === nodeCurrent.row + 1) || // S
+          (node.col === nodeCurrent.col - 1 && node.row === nodeCurrent.row    ) || // W
+          (
+            node.col === nodeCurrent.col - 1 && node.row === nodeCurrent.row - 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col + 1] === null ||
+              !gameObjects[node.row + 1] || gameObjects[node.row + 1][node.col    ] === null
+            )
+          ) || // NW
+          (
+            node.col === nodeCurrent.col + 1 && node.row === nodeCurrent.row - 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col - 1] === null ||
+              !gameObjects[node.row + 1] || gameObjects[node.row + 1][node.col    ] === null
+            )
+          ) || // NE
+          (
+            node.col === nodeCurrent.col + 1 && node.row === nodeCurrent.row + 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col - 1] === null ||
+              !gameObjects[node.row - 1] || gameObjects[node.row - 1][node.col    ] === null
+            )
+          ) || // SE
+          (
+            node.col === nodeCurrent.col - 1 && node.row === nodeCurrent.row + 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col + 1] === null ||
+              !gameObjects[node.row - 1] || gameObjects[node.row - 1][node.col    ] === null
+            )
+          ) // SW
+        )
       })
 
     nodeCurrent.neighbourNodes
