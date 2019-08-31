@@ -3,7 +3,7 @@ import * as CONFIG from '@app/configuration/config.json'
 import { context } from './Canvas'
 
 let lastFrameTime: number
-let frameDeltaTime: number
+let frameElapsedTime: number
 
 const FPS_ARR: number[] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 let FPS: number
@@ -23,9 +23,9 @@ export default class FrameRate {
       FPS = 0
     } else {
       const now = performance.now()
-      frameDeltaTime = (now - lastFrameTime) / 1000
+      frameElapsedTime = (now - lastFrameTime)
 
-      FPS_ARR.unshift(1 / (frameDeltaTime))
+      FPS_ARR.unshift(1000 / frameElapsedTime)
       FPS_ARR.pop()
       FPS = FPS_ARR.reduce((sum, current) => sum += current, 0) / FPS_ARR.length
 
