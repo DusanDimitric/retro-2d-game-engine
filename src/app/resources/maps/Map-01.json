@@ -31,7 +31,7 @@
     },
     {
       "x": 668,
-      "y": 250,
+      "y": 240,
       "healthPercentage": 0.8
     },
     {
@@ -42,6 +42,31 @@
     {
       "x": 540,
       "y": 220,
+      "healthPercentage": 0.3
+    },
+    {
+      "x": 456,
+      "y": 98,
+      "healthPercentage": 1
+    },
+    {
+      "x": 368,
+      "y": 98,
+      "healthPercentage": 0.5
+    },
+    {
+      "x": 668,
+      "y": 250,
+      "healthPercentage": 0.8
+    },
+    {
+      "x": 568,
+      "y": 230,
+      "healthPercentage": 0.3
+    },
+    {
+      "x": 540,
+      "y": 230,
       "healthPercentage": 0.3
     }
   ]
