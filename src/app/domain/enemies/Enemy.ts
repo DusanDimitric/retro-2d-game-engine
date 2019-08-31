@@ -1,6 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import CollisionBox from '@app/infrastructure/CollisionBox'
+import CollisionBox, { collisionBoxesIntersect } from '@app/infrastructure/CollisionBox'
 import Creature from '@app/domain/Creature'
 import Player from '@app/domain/player/Player'
 import { PathNode } from '@app/infrastructure/Pathfinding'
@@ -47,30 +47,12 @@ export default abstract class Enemy extends Creature {
     )
   }
 
-  public collidesWithPlayer(playerX: number, playerY: number, playerCollisionBox: CollisionBox): boolean {
-    return (
-      this.x - this.collisionBox.halfWidth  < playerX + playerCollisionBox.halfWidth  &&
-      this.x + this.collisionBox.halfWidth  > playerX - playerCollisionBox.halfWidth  &&
-      this.y - this.collisionBox.halfHeight < playerY + playerCollisionBox.halfHeight &&
-      this.y + this.collisionBox.halfHeight > playerY - playerCollisionBox.halfHeight
-    )
-  }
-
   public abstract takeDamage(damageAmount: number): void
   protected abstract advanceAnimation(): void
 
-  protected collidesWithEnemy(enemyX: number, enemyY: number, enemyCollisionBox: CollisionBox): boolean {
-    return (
-      this.x - this.collisionBox.halfWidth  < enemyX + enemyCollisionBox.halfWidth  &&
-      this.x + this.collisionBox.halfWidth  > enemyX - enemyCollisionBox.halfWidth  &&
-      this.y - this.collisionBox.halfHeight < enemyY + enemyCollisionBox.halfHeight &&
-      this.y + this.collisionBox.halfHeight > enemyY - enemyCollisionBox.halfHeight
-    )
-  }
-
   protected adjustCollisionWithOtherEnemies(enemies: Enemy[]): void {
     enemies.forEach(e => {
-      if (this !== e && this.collidesWithEnemy(e.x, e.y, e.collisionBox)) {
+      if (this !== e && collisionBoxesIntersect(this, e)) {
         let intersectionX: number
         let intersectionY: number
         if (this.x < e.x) {

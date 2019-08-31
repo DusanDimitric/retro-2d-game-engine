@@ -2,7 +2,7 @@ import * as CONFIG from '@app/configuration/config.json'
 
 import Canvas, { context } from '@app/infrastructure/Canvas'
 import Raycaster from '@app/infrastructure/Raycaster'
-import CollisionBox from '@app/infrastructure/CollisionBox'
+import CollisionBox, { collisionBoxesIntersect } from '@app/infrastructure/CollisionBox'
 import { angleBetweenPoints } from '@app/infrastructure/geometry/Point'
 
 import Creature from '@app/domain/Creature'
@@ -204,7 +204,7 @@ export default class Player extends Creature {
 
   private checkForCollisionWithEnemies(): void {
     if (getEnemiesOnScreen(this.x, this.y)
-      .filter(e => e.collidesWithPlayer(this.x, this.y, this.collisionBox))
+      .filter(e => collisionBoxesIntersect(e, this))
       .length > 0) {
         this.die()
       }

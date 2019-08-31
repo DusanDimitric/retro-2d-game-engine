@@ -1043,21 +1043,21 @@ const vertexSE2: Point = { ...blankVertex, deltas: { ...blankVertex.deltas } }
 function getVerticesNW(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
   vertexNW1.x = n1.x - n1.collisionBox.halfWidth
   vertexNW1.y = n1.y - n1.collisionBox.halfHeight
-  vertexNW1.deltas.dyTop = n1.deltas.dyTop
-  vertexNW1.deltas.dyBottom = n1.deltas.dyBottom
-  vertexNW1.deltas.dxLeft = n1.deltas.dxLeft
-  vertexNW1.deltas.dxRight = n1.deltas.dxRight
-  updatePointRowAndColValues(vertexNW1)
-  updatePointDeltas(vertexNW1)
+  vertexNW1.row = Math.floor(vertexNW1.y / CONFIG.TILE_SIZE)
+  vertexNW1.col = Math.floor(vertexNW1.x / CONFIG.TILE_SIZE)
+  vertexNW1.deltas.dyTop = vertexNW1.y % CONFIG.TILE_SIZE
+  vertexNW1.deltas.dyBottom = CONFIG.TILE_SIZE - vertexNW1.deltas.dyTop
+  vertexNW1.deltas.dxLeft = vertexNW1.x % CONFIG.TILE_SIZE
+  vertexNW1.deltas.dxRight = CONFIG.TILE_SIZE - vertexNW1.deltas.dxLeft
 
   vertexNW2.x = n2.x - n2.collisionBox.halfWidth
   vertexNW2.y = n2.y - n2.collisionBox.halfHeight
-  vertexNW2.deltas.dyTop = n2.deltas.dyTop
-  vertexNW2.deltas.dxRight = n2.deltas.dxRight
-  vertexNW2.deltas.dxLeft = n2.deltas.dxLeft
-  vertexNW2.deltas.dyBottom = n2.deltas.dyBottom
-  updatePointRowAndColValues(vertexNW2)
-  updatePointDeltas(vertexNW2)
+  vertexNW2.row = Math.floor(vertexNW2.y / CONFIG.TILE_SIZE)
+  vertexNW2.col = Math.floor(vertexNW2.x / CONFIG.TILE_SIZE)
+  vertexNW2.deltas.dyTop = vertexNW2.y % CONFIG.TILE_SIZE
+  vertexNW2.deltas.dyBottom = CONFIG.TILE_SIZE - vertexNW2.deltas.dyTop
+  vertexNW2.deltas.dxLeft = vertexNW2.x % CONFIG.TILE_SIZE
+  vertexNW2.deltas.dxRight = CONFIG.TILE_SIZE - vertexNW2.deltas.dxLeft
 
   return [ vertexNW1, vertexNW2 ]
 }
@@ -1065,21 +1065,21 @@ function getVerticesNW(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Po
 function getVerticesNE(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
   vertexNE1.x = n1.x + n1.collisionBox.halfWidth
   vertexNE1.y = n1.y - n1.collisionBox.halfHeight
-  vertexNE1.deltas.dyTop = n1.deltas.dyTop
-  vertexNE1.deltas.dxRight = n1.deltas.dxRight
-  vertexNE1.deltas.dxLeft = n1.deltas.dxLeft
-  vertexNE1.deltas.dyBottom = n1.deltas.dyBottom
-  updatePointRowAndColValues(vertexNE1)
-  updatePointDeltas(vertexNE1)
+  vertexNE1.row = Math.floor(vertexNE1.y / CONFIG.TILE_SIZE)
+  vertexNE1.col = Math.floor(vertexNE1.x / CONFIG.TILE_SIZE)
+  vertexNE1.deltas.dyTop = vertexNE1.y % CONFIG.TILE_SIZE
+  vertexNE1.deltas.dyBottom = CONFIG.TILE_SIZE - vertexNE1.deltas.dyTop
+  vertexNE1.deltas.dxLeft = vertexNE1.x % CONFIG.TILE_SIZE
+  vertexNE1.deltas.dxRight = CONFIG.TILE_SIZE - vertexNE1.deltas.dxLeft
 
   vertexNE2.x = n2.x + n2.collisionBox.halfWidth
   vertexNE2.y = n2.y - n2.collisionBox.halfHeight
-  vertexNE2.deltas.dyTop = n2.deltas.dyTop
-  vertexNE2.deltas.dxRight = n2.deltas.dxRight
-  vertexNE2.deltas.dxLeft = n2.deltas.dxLeft
-  vertexNE2.deltas.dyBottom = n2.deltas.dyBottom
-  updatePointRowAndColValues(vertexNE2)
-  updatePointDeltas(vertexNE2)
+  vertexNE2.row = Math.floor(vertexNE2.y / CONFIG.TILE_SIZE)
+  vertexNE2.col = Math.floor(vertexNE2.x / CONFIG.TILE_SIZE)
+  vertexNE2.deltas.dyTop = vertexNE2.y % CONFIG.TILE_SIZE
+  vertexNE2.deltas.dyBottom = CONFIG.TILE_SIZE - vertexNE2.deltas.dyTop
+  vertexNE2.deltas.dxLeft = vertexNE2.x % CONFIG.TILE_SIZE
+  vertexNE2.deltas.dxRight = CONFIG.TILE_SIZE - vertexNE2.deltas.dxLeft
 
   return [ vertexNE1, vertexNE2 ]
 }
@@ -1087,41 +1087,43 @@ function getVerticesNE(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Po
 function getVerticesSW(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
   vertexSW1.x = n1.x - n1.collisionBox.halfWidth
   vertexSW1.y = n1.y + n1.collisionBox.halfHeight
-  vertexSW1.deltas.dyTop = n1.deltas.dyTop
-  vertexSW1.deltas.dxRight = n1.deltas.dxRight
-  vertexSW1.deltas.dxLeft = n1.deltas.dxLeft
-  vertexSW1.deltas.dyBottom = n1.deltas.dyBottom
-  updatePointRowAndColValues(vertexSW1)
-  updatePointDeltas(vertexSW1)
+  vertexSW1.row = Math.floor(vertexSW1.y / CONFIG.TILE_SIZE)
+  vertexSW1.col = Math.floor(vertexSW1.x / CONFIG.TILE_SIZE)
+  vertexSW1.deltas.dyTop = vertexSW1.y % CONFIG.TILE_SIZE
+  vertexSW1.deltas.dyBottom = CONFIG.TILE_SIZE - vertexSW1.deltas.dyTop
+  vertexSW1.deltas.dxLeft = vertexSW1.x % CONFIG.TILE_SIZE
+  vertexSW1.deltas.dxRight = CONFIG.TILE_SIZE - vertexSW1.deltas.dxLeft
 
   vertexSW2.x = n2.x - n2.collisionBox.halfWidth
   vertexSW2.y = n2.y + n2.collisionBox.halfHeight
-  vertexSW2.deltas.dyTop = n2.deltas.dyTop
-  vertexSW2.deltas.dxRight = n2.deltas.dxRight
-  vertexSW2.deltas.dxLeft = n2.deltas.dxLeft
-  vertexSW2.deltas.dyBottom = n2.deltas.dyBottom
-  updatePointRowAndColValues(vertexSW2)
-  updatePointDeltas(vertexSW2)
+  vertexSW2.row = Math.floor(vertexSW2.y / CONFIG.TILE_SIZE)
+  vertexSW2.col = Math.floor(vertexSW2.x / CONFIG.TILE_SIZE)
+  vertexSW2.deltas.dyTop = vertexSW2.y % CONFIG.TILE_SIZE
+  vertexSW2.deltas.dyBottom = CONFIG.TILE_SIZE - vertexSW2.deltas.dyTop
+  vertexSW2.deltas.dxLeft = vertexSW2.x % CONFIG.TILE_SIZE
+  vertexSW2.deltas.dxRight = CONFIG.TILE_SIZE - vertexSW2.deltas.dxLeft
+
   return [ vertexSW1, vertexSW2 ]
 }
 
 function getVerticesSE(n1: PathNode | Enemy, n2: PathNode | Player): [ Point, Point ] {
   vertexSE1.x = n1.x + n1.collisionBox.halfWidth
   vertexSE1.y = n1.y + n1.collisionBox.halfHeight
-  vertexSE1.deltas.dyTop = n1.deltas.dyTop
-  vertexSE1.deltas.dxRight = n1.deltas.dxRight
-  vertexSE1.deltas.dxLeft = n1.deltas.dxLeft
-  vertexSE1.deltas.dyBottom = n1.deltas.dyBottom
-  updatePointRowAndColValues(vertexSE1)
-  updatePointDeltas(vertexSE1)
+  vertexSE1.row = Math.floor(vertexSE1.y / CONFIG.TILE_SIZE)
+  vertexSE1.col = Math.floor(vertexSE1.x / CONFIG.TILE_SIZE)
+  vertexSE1.deltas.dyTop = vertexSE1.y % CONFIG.TILE_SIZE
+  vertexSE1.deltas.dyBottom = CONFIG.TILE_SIZE - vertexSE1.deltas.dyTop
+  vertexSE1.deltas.dxLeft = vertexSE1.x % CONFIG.TILE_SIZE
+  vertexSW1.deltas.dxRight = CONFIG.TILE_SIZE - vertexSE1.deltas.dxLeft
 
   vertexSE2.x = n2.x + n2.collisionBox.halfWidth
   vertexSE2.y = n2.y + n2.collisionBox.halfHeight
-  vertexSE2.deltas.dyTop = n2.deltas.dyTop
-  vertexSE2.deltas.dxRight = n2.deltas.dxRight
-  vertexSE2.deltas.dxLeft = n2.deltas.dxLeft
-  vertexSE2.deltas.dyBottom = n2.deltas.dyBottom
-  updatePointRowAndColValues(vertexSE2)
-  updatePointDeltas(vertexSE2)
+  vertexSE2.row = Math.floor(vertexSE2.y / CONFIG.TILE_SIZE)
+  vertexSE2.col = Math.floor(vertexSE2.x / CONFIG.TILE_SIZE)
+  vertexSE2.deltas.dyTop = vertexSE2.y % CONFIG.TILE_SIZE
+  vertexSE2.deltas.dyBottom = CONFIG.TILE_SIZE - vertexSE2.deltas.dyTop
+  vertexSE2.deltas.dxLeft = vertexSE2.x % CONFIG.TILE_SIZE
+  vertexSW2.deltas.dxRight = CONFIG.TILE_SIZE - vertexSE2.deltas.dxLeft
+
   return [ vertexSE1, vertexSE2 ]
 }

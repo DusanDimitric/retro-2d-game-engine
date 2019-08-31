@@ -2,11 +2,11 @@ import * as CONFIG from '@app/configuration/config.json'
 
 import { NeighbourTiles } from '@app/domain/Grid'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
-import CollisionBox from '@app/infrastructure/CollisionBox'
+import CollisionBox, { collisionBoxesIntersect } from '@app/infrastructure/CollisionBox'
 import Canvas, { context } from '@app/infrastructure/Canvas'
 import Raycaster from './Raycaster'
 
-import { gameObjects } from '@app/domain/map/Map'
+import { gameObjects, enemies } from '@app/domain/map/Map'
 import GameObject from '@app/domain/objects/GameObject'
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
@@ -31,7 +31,7 @@ const PATH_NODE_OFFSET = 2
  *        ----              ----
  *      o      o          o      o
  */
-// TODO: cache path nodes for same collision box dimensions || don't generate path nodes every frame
+// TODO: cache path nodes for same collision box dimensions
 export function generatePathNodes(startRow: number, startCol: number, cBox: CollisionBox): PathNode[] {
   const path: PathNode[] = []
 
@@ -252,7 +252,11 @@ export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes:
     // Get neighbour nodes.
     nodeCurrent.neighbourNodes = [ ...pathfindingNodes ]
       .filter(node => {
+        // for (enemy of enemies) {
+        //   if (collisionBoxesIntersect(node, enemy)) { return false }
+        // }
         return Raycaster.determineIfThereAreObstaclesBetweenTwoPathNodes(nodeCurrent, node) === false
+        // return Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(nodeCurrent, node) === false
       })
 
     nodeCurrent.neighbourNodes

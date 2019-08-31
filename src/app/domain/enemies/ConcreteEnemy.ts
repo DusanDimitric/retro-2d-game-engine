@@ -41,6 +41,7 @@ export default class ConcreteEnemy extends Enemy {
     )
     this.thereAreObstaclesBetweenPlayerAndThisEnemy =
       Raycaster.determineIfThereAreObstaclesBetweenTwoPathNodes(this, player)
+      // Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(this, player)
     this.findPathToPlayer(player)
 
     this.move()
@@ -101,10 +102,20 @@ export default class ConcreteEnemy extends Enemy {
       this.pathfindingInterval = (this.pathfindingInterval + 1) % this.pathfindingPeriod
 
       if (this.shortestPath.length > 0) {
-        this.moveTowards(
-          this.shortestPath[this.shortestPath.length - 1].x,
-          this.shortestPath[this.shortestPath.length - 1].y
-        )
+        // If the enemy is close to the path node, pop that node and move to the next one
+        let nextNodeX = this.shortestPath[this.shortestPath.length - 1].x
+        let nextNodeY = this.shortestPath[this.shortestPath.length - 1].y
+        if (
+          this.shortestPath.length > 1 &&
+          Math.abs(nextNodeX - this.x) < 3 &&
+          Math.abs(nextNodeY - this.y) < 3
+        ) {
+          this.shortestPath.pop()
+          nextNodeX = this.shortestPath[this.shortestPath.length - 1].x
+          nextNodeY = this.shortestPath[this.shortestPath.length - 1].y
+        }
+
+        this.moveTowards(nextNodeX, nextNodeY)
       }
     }
     else {
@@ -148,7 +159,7 @@ export default class ConcreteEnemy extends Enemy {
       this.moving.up = true
     }
 
-    this.angleBetweenThisEnemyAndPlayer = +(angleBetweenPoints({ x, y }, this).toFixed(2))
+    this.angleBetweenThisEnemyAndPlayer = angleBetweenPoints({ x, y }, this)
     this.speed[0] = Math.round(Math.cos(this.angleBetweenThisEnemyAndPlayer)) * this.maxSpeed
     this.speed[1] = Math.round(Math.sin(this.angleBetweenThisEnemyAndPlayer)) * this.maxSpeed
   }
@@ -156,10 +167,12 @@ export default class ConcreteEnemy extends Enemy {
   // TODO: Compose this functionality since it's shared between enemies and player
   private move(): void {
     if (this.moving.left || this.moving.right) {
-      this.x += this.speed[0]
+      // this.x += this.speed[0]
+      this.x = Math.round(this.x + this.speed[0])
     }
     if (this.moving.up || this.moving.down) {
-      this.y += this.speed[1]
+      // this.y += this.speed[1]
+      this.y = Math.round(this.y + this.speed[1])
     }
     this.updateMapPosition()
   }
