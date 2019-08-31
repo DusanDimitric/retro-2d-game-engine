@@ -8,7 +8,7 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Raycaster from '@app/infrastructure/Raycaster'
-import { generatePathNodes, drawPathNodes, findShortestPath, drawNode } from '@app/infrastructure/Pathfinding'
+import { generatePathNodes, findShortestPath } from '@app/infrastructure/Pathfinding'
 
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
