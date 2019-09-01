@@ -1,37 +1,14 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import { NeighbourTiles } from '@app/domain/Grid'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox, { collisionBoxesIntersect } from '@app/infrastructure/CollisionBox'
 import Canvas, { context } from '@app/infrastructure/Canvas'
-import Raycaster from './Raycaster'
 
-import { gameObjects, enemies } from '@app/domain/map/Map'
-import GameObject from '@app/domain/objects/GameObject'
+import { gameObjects } from '@app/domain/map/Map'
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
 import RaycastablePoint from './geometry/RaycastablePoint'
 
-const PATH_NODE_OFFSET = 2
-
-/**
- *   o      o     o      o   o     o     o
- *     ----         ----       ---- ----
- *    |    |       |    |     |    |    |
- *     ----       o ---- o     ---- ----
- *   o      o      |    |    o     o     o
- *                  ----
- *                o      o
- *
- *      o     o     o          o      o
- *        ---- ----              ----
- *       |    |    |      o   o |    |
- *      o ---- ---- o       ---- ----
- *       |    | o          |    | o   o
- *        ----              ----
- *      o      o          o      o
- */
-// TODO: cache path nodes for same collision box dimensions
 export function generatePathNodes(startRow: number, startCol: number, cBox: CollisionBox): PathNode[] {
   const path: PathNode[] = []
 
@@ -50,164 +27,18 @@ export function generatePathNodes(startRow: number, startCol: number, cBox: Coll
 
   for (let row = rowStart; row < rowEnd; ++row) {
     for (let col = colStart - 1; col < colEnd; ++col) {
-      if (gameObjects[row] && gameObjects[row][col]) {
-        generateNodesAroundGameObject(path, gameObjects[row][col], cBox)
-      }
-
-      rowPrev = row - 1
-      colPrev = col - 1
-
-      if (
-        colPrev >= 0 && rowPrev >= 0 &&
-        (gameObjects[rowPrev] && !gameObjects[rowPrev][colPrev]) &&
-        !path.some(n => (n.row === rowPrev && n.col === colPrev))
-      ) {
-        path.push(new PathNode({
-          x: colPrev * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
-          y: rowPrev * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
-        }, cBox))
+      if (!gameObjects[row] || !gameObjects[row][col]) {
+        if (col > 0 && row > 0) {
+          path.push(new PathNode({
+            x: col * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
+            y: row * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
+          }, cBox))
+        }
       }
     }
   }
 
   return path
-}
-
-function generateNodesAroundGameObject(path: PathNode[], o: GameObject, cBox: CollisionBox): void {
-  const neighbours: NeighbourTiles = {
-    N  : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col    ] : null,
-    NE : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col + 1] : null,
-    E  : gameObjects[o.row    ] ? gameObjects[o.row    ][o.col + 1] : null,
-    SE : gameObjects[o.row + 1] ? gameObjects[o.row + 1][o.col + 1] : null,
-    S  : gameObjects[o.row + 1] ? gameObjects[o.row + 1][o.col    ] : null,
-    SW : gameObjects[o.row + 1] ? gameObjects[o.row + 1][o.col - 1] : null,
-    W  : gameObjects[o.row    ] ? gameObjects[o.row    ][o.col - 1] : null,
-    NW : gameObjects[o.row - 1] ? gameObjects[o.row - 1][o.col - 1] : null,
-  }
-
-  let nodeNE: PathNode = generateNodeNE(o, neighbours, cBox)
-  let nodeSE: PathNode = generateNodeSE(o, neighbours, cBox)
-  let nodeSW: PathNode = generateNodeSW(o, neighbours, cBox)
-  let nodeNW: PathNode = generateNodeNW(o, neighbours, cBox)
-
-  if (nodeNE && (nodeNE.x < 0 || nodeNE.y < 0)) { nodeNE = null }
-  if (nodeSE && (nodeSE.x < 0 || nodeSE.y < 0)) { nodeSE = null }
-  if (nodeSW && (nodeSW.x < 0 || nodeSW.y < 0)) { nodeSW = null }
-  if (nodeNW && (nodeNW.x < 0 || nodeNW.y < 0)) { nodeNW = null }
-
-  // Don't allow duplicate PathNodes
-  path.forEach(node => {
-    if (nodeNE && (node.x === nodeNE.x && node.y === nodeNE.y)) { nodeNE = null }
-    if (nodeSE && (node.x === nodeSE.x && node.y === nodeSE.y)) { nodeSE = null }
-    if (nodeSW && (node.x === nodeSW.x && node.y === nodeSW.y)) { nodeSW = null }
-    if (nodeNW && (node.x === nodeNW.x && node.y === nodeNW.y)) { nodeNW = null }
-  })
-
-  if (nodeNE) { path.push(nodeNE) }
-  if (nodeSE) { path.push(nodeSE) }
-  if (nodeSW) { path.push(nodeSW) }
-  if (nodeNW) { path.push(nodeNW) }
-}
-
-function generateNodeNE(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.NE) {
-    return null
-  }
-  else {
-    if (!neighbours.N && !neighbours.E) {
-      return new PathNode({
-        x:  PATH_NODE_OFFSET + o.mapX + o.width + cBox.halfWidth,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.N && !neighbours.E) {
-      return new PathNode({
-        x: PATH_NODE_OFFSET + o.mapX + o.width + cBox.halfWidth,
-        y: o.mapY,
-      }, cBox)
-    }
-    if (!neighbours.N && neighbours.E) {
-      return new PathNode({
-        x: o.mapX + o.width,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-  }
-}
-function generateNodeSE(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.SE) {
-    return null
-  }
-  else {
-    if (!neighbours.S && !neighbours.E) {
-      return new PathNode({
-        x: PATH_NODE_OFFSET + o.mapX + o.width  + cBox.halfWidth,
-        y: PATH_NODE_OFFSET +o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.S && !neighbours.E) {
-      return new PathNode({
-        x: PATH_NODE_OFFSET + o.mapX + o.width  + cBox.halfWidth,
-        y: o.mapY + o.height,
-      }, cBox)
-    }
-    if (!neighbours.S && neighbours.E) {
-      return new PathNode({
-        x: o.mapX + o.width,
-        y: PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-  }
-}
-function generateNodeSW(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.SW) {
-    return null
-  }
-  else {
-    if (!neighbours.S && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y:  PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.S && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y: o.mapY + o.height,
-      }, cBox)
-    }
-    if (!neighbours.S && neighbours.W) {
-      return new PathNode({
-        x: o.mapX,
-        y: PATH_NODE_OFFSET + o.mapY + o.height + cBox.halfHeight,
-      }, cBox)
-    }
-  }
-}
-function generateNodeNW(o: GameObject, neighbours: NeighbourTiles, cBox: CollisionBox): PathNode {
-  if (neighbours.NW) {
-    return null
-  }
-  else {
-    if (!neighbours.N && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-    if (neighbours.N && !neighbours.W) {
-      return new PathNode({
-        x: -PATH_NODE_OFFSET + o.mapX - cBox.halfWidth,
-        y: o.mapY,
-      }, cBox)
-    }
-    if (!neighbours.N && neighbours.W) {
-      return new PathNode({
-        x: o.mapX,
-        y: -PATH_NODE_OFFSET + o.mapY - cBox.halfHeight,
-      }, cBox)
-    }
-  }
 }
 
 export function drawPathNodes(path: PathNode[], player: Player, color: string): void {

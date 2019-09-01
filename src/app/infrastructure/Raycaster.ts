@@ -180,7 +180,7 @@ export default class Raycaster {
 
   private static outsideOfScreenOffset = CONFIG.TILE_SIZE * 2
   private static rangeHorizontal: number = Canvas.halfWidth  + Raycaster.outsideOfScreenOffset
-  private static rangeVertical: number   = Canvas.halfHeight + Raycaster.outsideOfScreenOffset
+  private static rangeVertical: number   = Canvas.halfHeight + Raycaster.outsideOfScreenOffset * 2
 
   // TODO: This is a naive implementation! Add 6x optimization
   private static getInterceptPointSE(p: RaycastablePoint, theta: number, pEnd?: RaycastablePoint): { hitPoint: Point, hitObject: GameObject } {

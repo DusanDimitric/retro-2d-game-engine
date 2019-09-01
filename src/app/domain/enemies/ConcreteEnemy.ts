@@ -8,7 +8,7 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 import Point, { pointToPointDistance, angleBetweenPoints } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Raycaster from '@app/infrastructure/Raycaster'
-import { generatePathNodes, drawPathNodes, findShortestPath, drawNode } from '@app/infrastructure/Pathfinding'
+import { generatePathNodes, findShortestPath } from '@app/infrastructure/Pathfinding'
 
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
@@ -23,7 +23,7 @@ export default class ConcreteEnemy extends Enemy {
     healthPercentage: number,
     protected pathfindingInterval: number
   ) {
-    super(x, y, new CollisionBox(16, 16), 1, healthPercentage)
+    super(x, y, new CollisionBox(14, 14), 1, healthPercentage)
     this.updateMapPosition()
   }
 
@@ -41,7 +41,6 @@ export default class ConcreteEnemy extends Enemy {
     )
     this.thereAreObstaclesBetweenPlayerAndThisEnemy =
       Raycaster.determineIfThereAreObstaclesBetweenTwoPathNodes(this, player)
-      // Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(this, player)
     this.findPathToPlayer(player)
 
     this.move()
@@ -55,6 +54,7 @@ export default class ConcreteEnemy extends Enemy {
 
   public draw(player: Player): void {
     this.drawCollisionBox(player) // Just for debugging
+    // this.drawRayToPlayer(player) // TODO: Just for debugging
     // drawPathNodes(this.pathfindingNodes, player, this.getHealthColor()) // TODO: Just for debugging
 
     // TODO: Just for debugging
@@ -102,20 +102,7 @@ export default class ConcreteEnemy extends Enemy {
       this.pathfindingInterval = (this.pathfindingInterval + 1) % this.pathfindingPeriod
 
       if (this.shortestPath.length > 0) {
-        // If the enemy is close to the path node, pop that node and move to the next one
-        let nextNodeX = this.shortestPath[this.shortestPath.length - 1].x
-        let nextNodeY = this.shortestPath[this.shortestPath.length - 1].y
-        if (
-          this.shortestPath.length > 1 &&
-          Math.abs(nextNodeX - this.x) < 3 &&
-          Math.abs(nextNodeY - this.y) < 3
-        ) {
-          this.shortestPath.pop()
-          nextNodeX = this.shortestPath[this.shortestPath.length - 1].x
-          nextNodeY = this.shortestPath[this.shortestPath.length - 1].y
-        }
-
-        this.moveTowards(nextNodeX, nextNodeY)
+        this.followTheShortestPath()
       }
     }
     else {
@@ -129,8 +116,24 @@ export default class ConcreteEnemy extends Enemy {
     }
   }
 
+  private followTheShortestPath(): void {
+    // If the enemy is close to the path node, pop that node and move to the next one
+    let nextNodeX = this.shortestPath[this.shortestPath.length - 1].x
+    let nextNodeY = this.shortestPath[this.shortestPath.length - 1].y
+    if (
+      this.shortestPath.length > 1 &&
+      Math.abs(nextNodeX - this.x) < 3 &&
+      Math.abs(nextNodeY - this.y) < 3
+    ) {
+      this.shortestPath.pop()
+      nextNodeX = this.shortestPath[this.shortestPath.length - 1].x
+      nextNodeY = this.shortestPath[this.shortestPath.length - 1].y
+    }
+    this.moveTowards(nextNodeX, nextNodeY)
+  }
+
   private moveTowardsPlayer(player: Player): void {
-    if (this.distanceFromPlayer > this.collisionBox.width - 2) {
+    if (this.distanceFromPlayer > this.collisionBox.width) {
       this.moveTowards(player.x, player.y)
     }
     else {
