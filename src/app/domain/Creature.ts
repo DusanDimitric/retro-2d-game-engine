@@ -156,8 +156,8 @@ export default abstract class Creature {
   protected updateDirection(): void {
     const direction: string[] = []
 
-    const dx = this.x - this.prevX[this.prevX.length - 1]
-    const dy = this.y - this.prevY[this.prevY.length - 1]
+    const dx = this.prevX[this.prevX.length - 1] - this.prevX[this.prevX.length - 2]
+    const dy = this.prevY[this.prevY.length - 1] - this.prevY[this.prevY.length - 2]
 
     if (dy > 0) {
       direction.push(Directions.S)
@@ -173,7 +173,7 @@ export default abstract class Creature {
       direction.push(Directions.W)
     }
 
-    const directionString = direction.join('') || 'S'
+    const directionString = direction.join('') || this.direction || 'S'
 
     this.direction = Directions[directionString as keyof typeof Directions]
   }
