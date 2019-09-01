@@ -132,7 +132,7 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   private moveTowardsPlayer(player: Player): void {
-    if (this.distanceFromPlayer > this.collisionBox.width - 4) {
+    if (this.distanceFromPlayer > this.collisionBox.width) {
       this.moveTowards(player.x, player.y)
     }
     else {
