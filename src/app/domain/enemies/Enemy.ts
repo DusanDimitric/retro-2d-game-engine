@@ -13,9 +13,6 @@ export default abstract class Enemy extends Creature {
 
   protected maxSpeedDiagonal: number
 
-  protected angleBetweenThisEnemyAndPlayer: number = 0.0
-  protected speed: [number, number] = [ 0, 0 ] // [ x, y ]
-
   protected stuck: boolean
 
   protected distanceFromPlayer: number

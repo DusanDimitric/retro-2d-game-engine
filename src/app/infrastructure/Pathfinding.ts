@@ -22,9 +22,6 @@ export function generatePathNodes(startRow: number, startCol: number, cBox: Coll
   if (rowStart < 0) { rowStart = 0 }
   if (colStart < 0) { colStart = 0 }
 
-  let rowPrev: number
-  let colPrev: number
-
   for (let row = rowStart; row < rowEnd; ++row) {
     for (let col = colStart - 1; col < colEnd; ++col) {
       if (!gameObjects[row] || !gameObjects[row][col]) {

@@ -5,7 +5,7 @@ import SoundFX from '@app/audio/SoundFX'
 import Game from '@app/infrastructure/game/Game'
 import GAME_STATES from '@app/infrastructure/game/game_states/GameStates'
 import Canvas, { context } from '@app/infrastructure/Canvas'
-import Point, { pointToPointDistance, angleBetweenPoints } from '@app/infrastructure/geometry/Point'
+import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Raycaster from '@app/infrastructure/Raycaster'
 import { generatePathNodes, findShortestPath } from '@app/infrastructure/Pathfinding'
@@ -223,6 +223,20 @@ export default class ConcreteEnemy extends Enemy {
       context.lineTo(-0.5 + Canvas.center.x + (this.x - player.x) + this.collisionBox.halfWidth, -0.5 + Canvas.center.y + (this.y - player.y) + this.collisionBox.halfHeight)
       context.lineTo( 0.5 + Canvas.center.x + (this.x - player.x) - this.collisionBox.halfWidth, -0.5 + Canvas.center.y + (this.y - player.y) + this.collisionBox.halfHeight)
       context.lineTo( 0.5 + Canvas.center.x + (this.x - player.x) - this.collisionBox.halfWidth,  0.5 + Canvas.center.y + (this.y - player.y) - this.collisionBox.halfHeight)
+    context.stroke()
+  }
+
+  // TODO: Just for debugging
+  private drawRayToPlayer(player: Player) {
+    if (this.thereAreObstaclesBetweenPlayerAndThisEnemy) {
+      context.strokeStyle = '#FFFF44'
+    } else {
+      context.strokeStyle = '#00F0FF'
+    }
+    context.lineWidth = 0.5
+    context.beginPath()
+      context.moveTo(Canvas.center.x + (this.x - player.x), Canvas.center.y + (this.y - player.y))
+      context.lineTo(Canvas.center.x, Canvas.center.y)
     context.stroke()
   }
 
