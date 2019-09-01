@@ -58,14 +58,14 @@ export default class ConcreteEnemy extends Enemy {
     // drawPathNodes(this.pathfindingNodes, player, this.getHealthColor()) // TODO: Just for debugging
 
     // TODO: Just for debugging
-    this.shortestPath
-      .forEach((n, i) => {
-        drawNode(n, player, n.visited ? '#FF0000' : '#FF00FF')
-      })
-    if (this.shortestPath.length > 0) {
-      this.drawRayToPoint(this.shortestPath[this.shortestPath.length - 1], player)
-      this.shortestPath.forEach(node => this.drawRayToPoint(node, player)) // Draw all lines
-    }
+    // this.shortestPath
+    //   .forEach((n, i) => {
+    //     drawNode(n, player, n.visited ? '#FF0000' : '#FF00FF')
+    //   })
+    // if (this.shortestPath.length > 0) {
+    //   this.drawRayToPoint(this.shortestPath[this.shortestPath.length - 1], player)
+    //   this.shortestPath.forEach(node => this.drawRayToPoint(node, player)) // Draw all lines
+    // }
     this.sprite.draw(this, { x: player.x, y: player.y })
   }
 
@@ -158,24 +158,41 @@ export default class ConcreteEnemy extends Enemy {
     else if (this.y > y) {
       this.moving.up = true
     }
-
-    this.angleBetweenThisEnemyAndPlayer = angleBetweenPoints({ x, y }, this)
-    this.speed[0] = Math.round(Math.cos(this.angleBetweenThisEnemyAndPlayer)) * this.maxSpeed
-    this.speed[1] = Math.round(Math.sin(this.angleBetweenThisEnemyAndPlayer)) * this.maxSpeed
   }
 
   // TODO: Compose this functionality since it's shared between enemies and player
   private move(): void {
-    if (this.moving.left || this.moving.right) {
-      // this.x += this.speed[0]
-      this.x = Math.round(this.x + this.speed[0])
+    if (this.moving.left) {
+      if (this.moving.up || this.moving.down) {
+        this.x -= this.maxSpeedDiagonal
+      } else {
+        this.x -= this.maxSpeed
+      }
     }
-    if (this.moving.up || this.moving.down) {
-      // this.y += this.speed[1]
-      this.y = Math.round(this.y + this.speed[1])
+    if (this.moving.right) {
+      if (this.moving.up || this.moving.down) {
+        this.x += this.maxSpeedDiagonal
+      } else {
+        this.x += this.maxSpeed
+      }
+    }
+    if (this.moving.up) {
+      if (this.moving.left || this.moving.right) {
+        this.y -= this.maxSpeedDiagonal
+      } else {
+        this.y -= this.maxSpeed
+      }
+    }
+    if (this.moving.down) {
+      if (this.moving.left || this.moving.right) {
+        this.y += this.maxSpeedDiagonal
+      } else {
+        this.y += this.maxSpeed
+      }
     }
     this.updateMapPosition()
   }
+
 
   // TODO: Compose this functionality since it's shared between enemies and player
   private updateMapPosition(): void {

@@ -45,10 +45,28 @@ export function generatePathNodes(startRow: number, startCol: number, cBox: Coll
   if (rowStart < 0) { rowStart = 0 }
   if (colStart < 0) { colStart = 0 }
 
+  let rowPrev: number
+  let colPrev: number
+
   for (let row = rowStart; row < rowEnd; ++row) {
     for (let col = colStart - 1; col < colEnd; ++col) {
-      if (!gameObjects[row] || !gameObjects[row][col]) { continue }
-      generateNodesAroundGameObject(path, gameObjects[row][col], cBox)
+      if (gameObjects[row] && gameObjects[row][col]) {
+        generateNodesAroundGameObject(path, gameObjects[row][col], cBox)
+      }
+
+      rowPrev = row - 1
+      colPrev = col - 1
+
+      if (
+        colPrev >= 0 && rowPrev >= 0 &&
+        (gameObjects[rowPrev] && !gameObjects[rowPrev][colPrev]) &&
+        !path.some(n => (n.row === rowPrev && n.col === colPrev))
+      ) {
+        path.push(new PathNode({
+          x: colPrev * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
+          y: rowPrev * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
+        }, cBox))
+      }
     }
   }
 
@@ -252,11 +270,41 @@ export function findShortestPath(enemy: Enemy, player: Player, pathfindingNodes:
     // Get neighbour nodes.
     nodeCurrent.neighbourNodes = [ ...pathfindingNodes ]
       .filter(node => {
-        // for (enemy of enemies) {
-        //   if (collisionBoxesIntersect(node, enemy)) { return false }
-        // }
-        return Raycaster.determineIfThereAreObstaclesBetweenTwoPathNodes(nodeCurrent, node) === false
-        // return Raycaster.determineIfThereAreObstaclesBetweenTwoPoints(nodeCurrent, node) === false
+        return (
+          (node.col === nodeCurrent.col     && node.row === nodeCurrent.row    ) || // Center
+          (node.col === nodeCurrent.col     && node.row === nodeCurrent.row - 1) || // N
+          (node.col === nodeCurrent.col + 1 && node.row === nodeCurrent.row    ) || // E
+          (node.col === nodeCurrent.col     && node.row === nodeCurrent.row + 1) || // S
+          (node.col === nodeCurrent.col - 1 && node.row === nodeCurrent.row    ) || // W
+          (
+            node.col === nodeCurrent.col - 1 && node.row === nodeCurrent.row - 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col + 1] === null ||
+              !gameObjects[node.row + 1] || gameObjects[node.row + 1][node.col    ] === null
+            )
+          ) || // NW
+          (
+            node.col === nodeCurrent.col + 1 && node.row === nodeCurrent.row - 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col - 1] === null ||
+              !gameObjects[node.row + 1] || gameObjects[node.row + 1][node.col    ] === null
+            )
+          ) || // NE
+          (
+            node.col === nodeCurrent.col + 1 && node.row === nodeCurrent.row + 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col - 1] === null ||
+              !gameObjects[node.row - 1] || gameObjects[node.row - 1][node.col    ] === null
+            )
+          ) || // SE
+          (
+            node.col === nodeCurrent.col - 1 && node.row === nodeCurrent.row + 1
+            && (
+              !gameObjects[node.row    ] || gameObjects[node.row    ][node.col + 1] === null ||
+              !gameObjects[node.row - 1] || gameObjects[node.row - 1][node.col    ] === null
+            )
+          ) // SW
+        )
       })
 
     nodeCurrent.neighbourNodes
