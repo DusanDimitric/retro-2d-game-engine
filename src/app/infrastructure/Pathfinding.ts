@@ -1,18 +1,13 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import { NeighbourTiles } from '@app/domain/Grid'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Canvas, { context } from '@app/infrastructure/Canvas'
-import Raycaster from './Raycaster'
 
 import { gameObjects } from '@app/domain/map/Map'
-import GameObject from '@app/domain/objects/GameObject'
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
 import RaycastablePoint from './geometry/RaycastablePoint'
-
-const PATH_NODE_OFFSET = 2
 
 export function generatePathNodes(startRow: number, startCol: number, cBox: CollisionBox): PathNode[] {
   const path: PathNode[] = []
@@ -42,7 +37,6 @@ export function generatePathNodes(startRow: number, startCol: number, cBox: Coll
 
   return path
 }
-
 
 export function drawPathNodes(path: PathNode[], player: Player, color: string): void {
   if (path) {
