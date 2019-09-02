@@ -1,6 +1,6 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import CollisionBox from '@app/infrastructure/CollisionBox'
+import CollisionBox, { collisionBoxesIntersect, ICollidable } from '@app/infrastructure/CollisionBox'
 
 import { gameObjects } from '@app/domain/map/Map'
 import { Directions } from '@app/infrastructure/Directions'
@@ -10,8 +10,13 @@ export default abstract class Creature {
   public prevY: number[] = [] // TODO: Make private?
   public x: number
   public y: number
+  public nextX: number
+  public nextY: number
   public row: number
   public col: number
+
+  public maxSpeed: number
+  public maxSpeedDiagonal: number
 
   public animationInterval: number = 0
 
@@ -23,13 +28,97 @@ export default abstract class Creature {
     up    : false,
     down  : false,
   }
+  public blocked = {
+    left  : false,
+    right : false,
+    up    : false,
+    down  : false,
+  }
   public deltas = {
     dyTop    : 0,
     dyBottom : 0,
     dxLeft   : 0,
     dxRight  : 0,
   }
-  protected collisionBox: CollisionBox
+  public collisionBox: CollisionBox
+
+  protected resetMoving(): void {
+    this.moving.left  = false
+    this.moving.right = false
+    this.moving.up    = false
+    this.moving.down  = false
+  }
+
+  protected resetBlocked(): void {
+    this.blocked.up    = false
+    this.blocked.down  = false
+    this.blocked.left  = false
+    this.blocked.right = false
+  }
+
+  protected calculateNextCoordinates(): void {
+    this.nextX = this.x
+    this.nextY = this.y
+
+    if (this.moving.left) {
+      if (this.moving.up || this.moving.down) {
+        this.nextX -= this.maxSpeedDiagonal
+      } else {
+        this.nextX -= this.maxSpeed
+      }
+    }
+    if (this.moving.right) {
+      if (this.moving.up || this.moving.down) {
+        this.nextX += this.maxSpeedDiagonal
+      } else {
+        this.nextX += this.maxSpeed
+      }
+    }
+    if (this.moving.up) {
+      if (this.moving.left || this.moving.right) {
+        this.nextY -= this.maxSpeedDiagonal
+      } else {
+        this.nextY -= this.maxSpeed
+      }
+    }
+    if (this.moving.down) {
+      if (this.moving.left || this.moving.right) {
+        this.nextY += this.maxSpeedDiagonal
+      } else {
+        this.nextY += this.maxSpeed
+      }
+    }
+  }
+
+  protected checkIfBlockedByCreature(c: Creature, nextCreatureState: ICollidable) {
+    if (collisionBoxesIntersect(nextCreatureState, c)) {
+      let intersectionX: number
+      let intersectionY: number
+      if (nextCreatureState.x < c.x) {
+        intersectionX = (nextCreatureState.x + nextCreatureState.collisionBox.halfWidth) - (c.x - c.collisionBox.halfWidth)
+      } else if (nextCreatureState.x > c.x) {
+        intersectionX = (c.x + c.collisionBox.halfWidth) - (nextCreatureState.x - nextCreatureState.collisionBox.halfWidth)
+      }
+      if (nextCreatureState.y < c.y) {
+        intersectionY = (nextCreatureState.y + nextCreatureState.collisionBox.halfHeight) - (c.y - c.collisionBox.halfHeight)
+      } else if (nextCreatureState.y > c.y) {
+        intersectionY = (c.y + c.collisionBox.halfHeight) - (nextCreatureState.y - nextCreatureState.collisionBox.halfHeight)
+      }
+      if (!intersectionX || intersectionX >= intersectionY) {
+        if (nextCreatureState.y < c.y) {
+          this.blocked.down = true
+        } else {
+          this.blocked.up = true
+        }
+      } else if (!intersectionY || intersectionX < intersectionY) {
+        if (nextCreatureState.x < c.x) {
+          this.blocked.right = true
+        } else {
+          this.blocked.left = true
+        }
+      }
+    }
+  }
 
   protected adjustCollisionWithGameObjects(): void {
     let o

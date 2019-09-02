@@ -11,17 +11,11 @@ import Crosshair from './Crosshair'
 import Projectile from './Projectile'
 
 import SoundFX from '@app/audio/SoundFX'
-import Game from '@app/infrastructure/game/Game'
-import GameStateManager from '@app/infrastructure/game/game_states/GameStateManager'
-import GAME_STATES from '@app/infrastructure/game/game_states/GameStates'
 
 export default class Player extends Creature {
   public alive: boolean = true
   public rotation: number = 0
   public sightLineLength = 10
-  public collisionBox: CollisionBox = new CollisionBox(12, 12)
-  private maxSpeed: number = 2
-  private maxSpeedDiagonal: number = Math.round(Math.sin(45) * this.maxSpeed)
   private shooting = false
   private shootingCooldown = 6
   private projectiles: Projectile[] = []
@@ -32,11 +26,23 @@ export default class Player extends Creature {
   )
   {
     super()
+
+    this.maxSpeed = 2
+    this.maxSpeedDiagonal = Math.round(Math.sin(45) * this.maxSpeed)
+
+    this.collisionBox = new CollisionBox(12, 12)
+
     this.updateMapPosition()
   }
 
   public update(): void {
+    this.resetBlocked()
+    this.calculateNextCoordinates()
+
+    this.checkForCollisionWithEnemies()
     this.move()
+    this.adjustCollisionWithGameObjects()
+    this.updateMapPosition()
     this.updateTileDeltas()
     this.shoot()
     this.projectiles.forEach((p, i) => {
@@ -45,33 +51,6 @@ export default class Player extends Creature {
         this.projectiles.splice(i, 1) // Remove the projectile
       }
     })
-  }
-
-  public shoot(): void {
-    if (this.shooting && this.shootingCooldown <= 0) {
-      const dx = (Canvas.mousePosition.x - Canvas.center.x)
-      const dy = (Canvas.mousePosition.y - Canvas.center.y)
-      let xVel = dx / ( Math.abs(dx) + Math.abs(dy) )
-      let yVel = dy / ( Math.abs(dx) + Math.abs(dy) )
-
-      // TODO: GAME FEATURE: Insert accuracy skill to reduce bullet motion randomness
-      // TODO: Fix the problem with different bullet speeds caused by randomness
-      const randomFactorX = Math.random() * 0.1 - 0.05
-      const randomFactorY = Math.random() * 0.1 - 0.05
-      xVel += randomFactorX
-      yVel += randomFactorY
-
-      this.projectiles.push(new Projectile(this.x, this.y, xVel, yVel))
-      this.shootingCooldown = 6
-
-      SoundFX.playSMG()
-    } else {
-      --this.shootingCooldown
-    }
-  }
-
-  public setShooting(isShooting: boolean): void {
-    this.shooting = isShooting
   }
 
   public draw(): void {
@@ -103,38 +82,62 @@ export default class Player extends Creature {
     this.drawProjectiles()
   }
 
+  public shoot(): void {
+    if (this.shooting && this.shootingCooldown <= 0) {
+      const dx = (Canvas.mousePosition.x - Canvas.center.x)
+      const dy = (Canvas.mousePosition.y - Canvas.center.y)
+      let xVel = dx / ( Math.abs(dx) + Math.abs(dy) )
+      let yVel = dy / ( Math.abs(dx) + Math.abs(dy) )
+
+      // TODO: GAME FEATURE: Insert accuracy skill to reduce bullet motion randomness
+      // TODO: Fix the problem with different bullet speeds caused by randomness
+      const randomFactorX = Math.random() * 0.1 - 0.05
+      const randomFactorY = Math.random() * 0.1 - 0.05
+      xVel += randomFactorX
+      yVel += randomFactorY
+
+      this.projectiles.push(new Projectile(this.x, this.y, xVel, yVel))
+      this.shootingCooldown = 6
+
+      SoundFX.playSMG()
+    } else {
+      --this.shootingCooldown
+    }
+  }
+
+  public setShooting(isShooting: boolean): void {
+    this.shooting = isShooting
+  }
+
   private move(): void {
-    if (this.moving.left) {
+    if (this.moving.left && !this.blocked.left) {
       if (this.moving.up || this.moving.down) {
         this.x -= this.maxSpeedDiagonal
       } else {
         this.x -= this.maxSpeed
       }
     }
-    if (this.moving.right) {
+    if (this.moving.right && !this.blocked.right) {
       if (this.moving.up || this.moving.down) {
         this.x += this.maxSpeedDiagonal
       } else {
         this.x += this.maxSpeed
       }
     }
-    if (this.moving.up) {
+    if (this.moving.up && !this.blocked.up) {
       if (this.moving.left || this.moving.right) {
         this.y -= this.maxSpeedDiagonal
       } else {
         this.y -= this.maxSpeed
       }
     }
-    if (this.moving.down) {
+    if (this.moving.down && !this.blocked.down) {
       if (this.moving.left || this.moving.right) {
         this.y += this.maxSpeedDiagonal
       } else {
         this.y += this.maxSpeed
       }
     }
-    this.adjustCollisionWithGameObjects()
-    this.checkForCollisionWithEnemies()
-    this.updateMapPosition()
   }
 
   private calculateTheta(): number {
@@ -203,11 +206,14 @@ export default class Player extends Creature {
   }
 
   private checkForCollisionWithEnemies(): void {
-    if (getEnemiesOnScreen(this.x, this.y)
-      .filter(e => collisionBoxesIntersect(e, this))
-      .length > 0) {
-        this.die()
-      }
+    const nextPlayerState = { x: this.nextX, y: this.nextY, collisionBox: this.collisionBox }
+    const enemiesOnScreen = getEnemiesOnScreen(this.x, this.y)
+
+    if (enemiesOnScreen.some(e => collisionBoxesIntersect(e, nextPlayerState))) {
+      enemiesOnScreen.forEach(e => {
+        this.checkIfBlockedByCreature(e, nextPlayerState)
+      })
+    }
   }
 
   private die(): void {

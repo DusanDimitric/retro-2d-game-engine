@@ -1,17 +1,16 @@
 import * as CONFIG from '@app/configuration/config.json'
 
-import CollisionBox, { collisionBoxesIntersect } from '@app/infrastructure/CollisionBox'
+import CollisionBox from '@app/infrastructure/CollisionBox'
 import Creature from '@app/domain/Creature'
 import Player from '@app/domain/player/Player'
 import { PathNode } from '@app/infrastructure/Pathfinding'
 import CreatureSprite from '@app/graphics/sprites/CreatureSprite'
+import { getEnemiesOnScreen } from '../map/Map'
 
 export default abstract class Enemy extends Creature {
   public alive: boolean = true
   public maxHealth: number = 100
   public health: number
-
-  protected maxSpeedDiagonal: number
 
   protected stuck: boolean
 
@@ -27,14 +26,17 @@ export default abstract class Enemy extends Creature {
   constructor(
     public x: number,
     public y: number,
-    public collisionBox: CollisionBox,
-    protected maxSpeed: number,
+    collisionBox: CollisionBox,
+    maxSpeed: number,
     healthPercentage: number,
   ) {
     super()
     this.initializeHealth(healthPercentage)
 
+    this.maxSpeed = maxSpeed
     this.maxSpeedDiagonal = Math.round(Math.sin(45) * this.maxSpeed)
+
+    this.collisionBox = collisionBox
   }
 
   public abstract draw(player: Player): void
@@ -51,34 +53,18 @@ export default abstract class Enemy extends Creature {
   public abstract takeDamage(damageAmount: number): void
   protected abstract advanceAnimation(): void
 
-  protected adjustCollisionWithOtherEnemies(enemies: Enemy[]): void {
-    enemies.forEach(e => {
-      if (this !== e && collisionBoxesIntersect(this, e)) {
-        let intersectionX: number
-        let intersectionY: number
-        if (this.x < e.x) {
-          intersectionX = (this.x + this.collisionBox.halfWidth) - (e.x - e.collisionBox.halfWidth)
-        } else if (this.x > e.x) {
-          intersectionX = (e.x + e.collisionBox.halfWidth) - (this.x - this.collisionBox.halfWidth)
-        }
-        if (this.y < e.y) {
-          intersectionY = (this.y + this.collisionBox.halfHeight) - (e.y - e.collisionBox.halfHeight)
-        } else if (this.y > e.y) {
-          intersectionY = (e.y + e.collisionBox.halfHeight) - (this.y - this.collisionBox.halfHeight)
-        }
-        if (!intersectionX || intersectionX >= intersectionY) {
-          if (this.y < e.y) {
-            e.y += intersectionY
-          } else {
-            e.y -= intersectionY
-          }
-        } else if (!intersectionY || intersectionX < intersectionY) {
-          if (this.x < e.x) {
-            e.x += intersectionX
-          } else {
-            e.x -= intersectionX
-          }
-        }
+  protected checkForCollisionWithPlayer(player: Player): void {
+    const nextEnemyState = { x: this.nextX, y: this.nextY, collisionBox: this.collisionBox }
+    this.checkIfBlockedByCreature(player, nextEnemyState)
+  }
+
+  protected checkForCollisionWithOtherEnemies(player: Player): void {
+    const nextEnemyState = { x: this.nextX, y: this.nextY, collisionBox: this.collisionBox }
+    const enemiesInScreenRangeFromThis = getEnemiesOnScreen(this.x, this.y)
+
+    enemiesInScreenRangeFromThis.forEach(e => {
+      if (this !== e) {
+        this.checkIfBlockedByCreature(e, nextEnemyState)
       }
     })
   }

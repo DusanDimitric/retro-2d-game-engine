@@ -18,11 +18,12 @@ export default class CollisionBox {
   }
 }
 
-interface ICollidable {
+export interface ICollidable {
   x: number
   y: number
   collisionBox: CollisionBox
 }
+
 export function collisionBoxesIntersect(a: ICollidable, b: ICollidable): boolean {
   return (
     a.x - a.collisionBox.halfWidth  < b.x + b.collisionBox.halfWidth  &&

@@ -19,81 +19,21 @@
     [ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
   ],
   "enemies": [
-    {
-      "x": 286,
-      "y": 88,
-      "healthPercentage": 1
-    },
-    {
-      "x": 368,
-      "y": 90,
-      "healthPercentage": 0.5
-    },
-    {
-      "x": 668,
-      "y": 240,
-      "healthPercentage": 0.8
-    },
-    {
-      "x": 568,
-      "y": 216,
-      "healthPercentage": 0.3
-    },
-    {
-      "x": 540,
-      "y": 220,
-      "healthPercentage": 0.3
-    },
-    {
-      "x": 466,
-      "y": 120,
-      "healthPercentage": 1
-    },
-    {
-      "x": 368,
-      "y": 98,
-      "healthPercentage": 0.5
-    },
-    {
-      "x": 648,
-      "y": 230,
-      "healthPercentage": 0.8
-    },
-    {
-      "x": 568,
-      "y": 226,
-      "healthPercentage": 0.3
-    },
-    {
-      "x": 540,
-      "y": 230,
-      "healthPercentage": 0.3
-    },
-    {
-      "x": 436,
-      "y": 98,
-      "healthPercentage": 1
-    },
-    {
-      "x": 360,
-      "y": 128,
-      "healthPercentage": 0.5
-    },
-    {
-      "x": 648,
-      "y": 246,
-      "healthPercentage": 0.8
-    },
-    {
-      "x": 548,
-      "y": 230,
-      "healthPercentage": 0.3
-    },
-    {
-      "x": 520,
-      "y": 230,
-      "healthPercentage": 0.3
-    },
+    { "x": 286, "y": 88, "healthPercentage": 1 },
+    { "x": 368, "y": 90, "healthPercentage": 0.5 },
+    { "x": 368, "y": 112, "healthPercentage": 0.5 },
+    { "x": 668, "y": 240, "healthPercentage": 0.8 },
+    { "x": 568, "y": 216, "healthPercentage": 0.3 },
+    { "x": 540, "y": 220, "healthPercentage": 0.3 },
+    { "x": 466, "y": 120, "healthPercentage": 1 },
+    { "x": 648, "y": 230, "healthPercentage": 0.8 },
+    { "x": 568, "y": 226, "healthPercentage": 0.3 },
+    { "x": 540, "y": 230, "healthPercentage": 0.3 },
+    { "x": 436, "y": 98, "healthPercentage": 1 },
+    { "x": 360, "y": 128, "healthPercentage": 0.5 },
+    { "x": 648, "y": 246, "healthPercentage": 0.8 },
+    { "x": 548, "y": 230, "healthPercentage": 0.3 },
+    { "x": 520, "y": 230, "healthPercentage": 0.3 },
 
     { "x": 320, "y": 500, "healthPercentage": 0.3 },
     { "x": 336, "y": 500, "healthPercentage": 0.3 },

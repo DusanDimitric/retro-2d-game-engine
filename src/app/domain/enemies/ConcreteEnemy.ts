@@ -8,7 +8,7 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Raycaster from '@app/infrastructure/Raycaster'
-import { generatePathNodes, findShortestPath } from '@app/infrastructure/Pathfinding'
+import { generatePathNodes, findShortestPath, drawPathNodes } from '@app/infrastructure/Pathfinding'
 
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
@@ -28,13 +28,16 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   public update(player: Player, enemies: Enemy[]): void {
+    this.resetBlocked()
+    this.calculateNextCoordinates()
     this.updatePreviousCoordinates()
 
     this.stuck    = this.checkIfStuck()
     this.isMoving = this.checkIfMoving()
 
     this.adjustCollisionWithGameObjects()
-    this.adjustCollisionWithOtherEnemies(enemies)
+    this.checkForCollisionWithPlayer(player)
+    this.checkForCollisionWithOtherEnemies(player)
     this.distanceFromPlayer = pointToPointDistance(
       { x: player.x, y: player.y },
       { x: this.x,   y: this.y   }
@@ -137,18 +140,13 @@ export default class ConcreteEnemy extends Enemy {
       this.moveTowards(player.x, player.y)
     }
     else {
-      this.moving.left  = false
-      this.moving.right = false
-      this.moving.up    = false
-      this.moving.down  = false
+      this.resetMoving()
     }
   }
 
   private moveTowards(x: number, y: number): void {
-    this.moving.left  = false
-    this.moving.right = false
-    this.moving.up    = false
-    this.moving.down  = false
+    this.resetMoving()
+
     if (this.x < x) {
       this.moving.right = true
     }
@@ -165,28 +163,28 @@ export default class ConcreteEnemy extends Enemy {
 
   // TODO: Compose this functionality since it's shared between enemies and player
   private move(): void {
-    if (this.moving.left) {
+    if (this.moving.left && !this.blocked.left) {
       if (this.moving.up || this.moving.down) {
         this.x -= this.maxSpeedDiagonal
       } else {
         this.x -= this.maxSpeed
       }
     }
-    if (this.moving.right) {
+    if (this.moving.right && !this.blocked.right) {
       if (this.moving.up || this.moving.down) {
         this.x += this.maxSpeedDiagonal
       } else {
         this.x += this.maxSpeed
       }
     }
-    if (this.moving.up) {
+    if (this.moving.up && !this.blocked.up) {
       if (this.moving.left || this.moving.right) {
         this.y -= this.maxSpeedDiagonal
       } else {
         this.y -= this.maxSpeed
       }
     }
-    if (this.moving.down) {
+    if (this.moving.down && !this.blocked.down) {
       if (this.moving.left || this.moving.right) {
         this.y += this.maxSpeedDiagonal
       } else {
@@ -195,7 +193,6 @@ export default class ConcreteEnemy extends Enemy {
     }
     this.updateMapPosition()
   }
-
 
   // TODO: Compose this functionality since it's shared between enemies and player
   private updateMapPosition(): void {
