@@ -73,9 +73,9 @@ export default abstract class Enemy extends Creature {
     const xIsStatic = this.prevX.every(x => x === this.prevX[0])
     const yIsStatic = this.prevY.every(y => y === this.prevY[0])
     if (xIsStatic && yIsStatic) {
-      return false
-    } else {
       return true
+    } else {
+      return false
     }
   }
 
