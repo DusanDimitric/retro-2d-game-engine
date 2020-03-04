@@ -161,7 +161,9 @@ export default class Player extends Creature {
       context.lineTo(Canvas.center.x + (this.sightLineLength * Math.cos(theta)), Canvas.center.y + (this.sightLineLength * Math.sin(theta)))
     context.stroke()
 
-    this.drawCollisionBox() // Just for debugging
+    if (CONFIG.DEBUG.PLAYER_COLLISION_BOX) {
+      this.drawCollisionBox()
+    }
   }
 
   private drawCollisionBox() {

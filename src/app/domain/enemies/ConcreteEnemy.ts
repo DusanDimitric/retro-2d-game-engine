@@ -8,7 +8,7 @@ import Canvas, { context } from '@app/infrastructure/Canvas'
 import Point, { pointToPointDistance } from '@app/infrastructure/geometry/Point'
 import CollisionBox from '@app/infrastructure/CollisionBox'
 import Raycaster from '@app/infrastructure/Raycaster'
-import { generatePathNodes, findShortestPath, drawPathNodes } from '@app/infrastructure/Pathfinding'
+import { generatePathNodes, findShortestPath, drawPathNodes, drawNode } from '@app/infrastructure/Pathfinding'
 
 import Player from '@app/domain/player/Player'
 import Enemy from '@app/domain/enemies/Enemy'
@@ -60,19 +60,19 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   public draw(player: Player): void {
-    this.drawCollisionBox(player) // Just for debugging
-    // this.drawRayToPlayer(player) // TODO: Just for debugging
-    // drawPathNodes(this.pathfindingNodes, player, this.getHealthColor()) // TODO: Just for debugging
+    if (CONFIG.DEBUG.ENEMY_COLLISION_BOX) {
+      this.drawCollisionBox(player)
+    }
+    if (CONFIG.DEBUG.RAY_TO_PLAYER) {
+      this.drawRayToPlayer(player)
+    }
+    if (CONFIG.DEBUG.PATHFINDING_NODES) {
+      drawPathNodes(this.pathfindingNodes, player, this.getHealthColor())
+    }
 
-    // TODO: Just for debugging
-    // this.shortestPath
-    //   .forEach((n, i) => {
-    //     drawNode(n, player, n.visited ? '#FF0000' : '#FF00FF')
-    //   })
-    // if (this.shortestPath.length > 0) {
-    //   this.drawRayToPoint(this.shortestPath[this.shortestPath.length - 1], player)
-    //   this.shortestPath.forEach(node => this.drawRayToPoint(node, player)) // Draw all lines
-    // }
+    if (CONFIG.DEBUG.SHORTEST_PATH_TO_PLAYER) {
+      this.drawShortestPathToPlayer(player)
+    }
     this.sprite.draw(this, { x: player.x, y: player.y })
   }
 
@@ -242,12 +242,25 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   // TODO: Just for debugging
-  private drawRayToPoint(p: Point, player: Player) {
+  private drawShortestPathToPlayer(p: Player) {
+    this.shortestPath
+      .forEach((n, i) => {
+        drawNode(n, p, n.visited ? '#FF0000' : '#FF00FF')
+      })
+    if (this.shortestPath.length > 0) {
+      this.shortestPath.forEach((node, i) => {
+        this.drawRayFromPointToPoint(node, this.shortestPath[i - 1] || p, p)
+      })
+    }
+  }
+
+  // TODO: Just for debugging
+  private drawRayFromPointToPoint(p1: Point, p2: Point, player: Player) {
     context.strokeStyle = '#FF00FF'
     context.lineWidth = 0.2
     context.beginPath()
-      context.moveTo(Canvas.center.x + (this.x - player.x), Canvas.center.y + (this.y - player.y))
-      context.lineTo(Canvas.center.x + (p.x - player.x), Canvas.center.y + (p.y - player.y))
+      context.moveTo(Canvas.center.x + (p2.x - player.x), Canvas.center.y + (p2.y - player.y))
+      context.lineTo(Canvas.center.x + (p1.x - player.x), Canvas.center.y + (p1.y - player.y))
     context.stroke()
   }
 }

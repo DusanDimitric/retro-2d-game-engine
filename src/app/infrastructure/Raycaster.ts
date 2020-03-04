@@ -214,7 +214,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -272,7 +272,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -388,7 +388,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -446,7 +446,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -562,7 +562,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -620,7 +620,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -736,7 +736,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -794,7 +794,7 @@ export default class Raycaster {
         }
       }
 
-      if (CONFIG.RAYCASTER.DEBUG) {
+      if (CONFIG.DEBUG.RAYCASTER) {
         let coordinates: Point
         if (pEnd) {
           coordinates = {
@@ -893,7 +893,7 @@ export default class Raycaster {
       }
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 112 + i * 12)
     }
 
@@ -908,7 +908,7 @@ export default class Raycaster {
       gameObjectHit = gameObjects[yTile][xTile]
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 212 + i * 12)
     }
 
@@ -924,7 +924,7 @@ export default class Raycaster {
       gameObjectHit = gameObjects[yTile][xTile]
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 112 + i * 12)
     }
 
@@ -945,7 +945,7 @@ export default class Raycaster {
       }
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 212 + i * 12)
     }
 
@@ -961,7 +961,7 @@ export default class Raycaster {
       gameObjectHit = gameObjects[yTile][xTile]
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 112 + i * 12)
     }
 
@@ -976,7 +976,7 @@ export default class Raycaster {
       gameObjectHit = gameObjects[yTile][xTile]
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 212 + i * 12)
     }
 
@@ -998,7 +998,7 @@ export default class Raycaster {
       }
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 112 + i * 12)
     }
 
@@ -1013,7 +1013,7 @@ export default class Raycaster {
       gameObjectHit = gameObjects[yTile][xTile]
     }
 
-    if (CONFIG.RAYCASTER.DEBUG) {
+    if (CONFIG.DEBUG.RAYCASTER) {
       context.fillText(`col: ${xTile}, row: ${yTile}, hit: ${gameObjectHit ? [gameObjectHit.row, gameObjectHit.col] : null}`, 10, 212 + i * 12)
     }
 

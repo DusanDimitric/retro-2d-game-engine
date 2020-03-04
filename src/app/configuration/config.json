@@ -3,8 +3,14 @@
   "CANVAS_HEIGHT": 320,
   "TILE_SIZE": 32,
   "SCALE": 2,
-  "RAYCASTER": {
-    "DEBUG": false
+  "DEBUG": {
+    "FPS": true,
+    "RAYCASTER": false,
+    "RAY_TO_PLAYER": false,
+    "PATHFINDING_NODES": false,
+    "SHORTEST_PATH_TO_PLAYER": false,
+    "PLAYER_COLLISION_BOX": true,
+    "ENEMY_COLLISION_BOX": false
   },
   "THROW_DEVELOPMENT_ERRORS": true
 }

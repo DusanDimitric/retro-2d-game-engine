@@ -1,3 +1,5 @@
+import * as CONFIG from '@app/configuration/config.json'
+
 import AudioLoader from '@app/audio/AudioLoader'
 import GraphicsLoader from '@app/graphics/GraphicsLoader'
 import Canvas from '@app/infrastructure/Canvas'
@@ -76,6 +78,8 @@ export default class Game {
   private render(): void {
     Canvas.clear()
     Game.stateManager.render()
-    FrameRate.drawFPS() // TODO: Remove this, used just for debugging
+    if (CONFIG.DEBUG.FPS) {
+      FrameRate.drawFPS()
+    }
   }
 }
