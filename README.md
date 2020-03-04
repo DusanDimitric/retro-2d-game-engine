@@ -16,6 +16,10 @@ make
 #### 2. Step
 Serve the root directory and open index.html in your browser
 
+```
+python3 -m http.server
+```
+
 ## Check for TypeScript validity:
 
 TS compilation should run without errors:

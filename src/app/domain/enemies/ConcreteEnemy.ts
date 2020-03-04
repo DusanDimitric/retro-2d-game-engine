@@ -17,6 +17,7 @@ import Sprites from '@app/graphics/Sprites'
 
 export default class ConcreteEnemy extends Enemy {
   protected sprite: CreatureSprite = Sprites.Zerg
+  protected target: Point
   constructor(
     x: number,
     y: number,
@@ -28,6 +29,9 @@ export default class ConcreteEnemy extends Enemy {
   }
 
   public update(player: Player, enemies: Enemy[]): void {
+    if (!this.target) {
+      this.target = player
+    }
     this.resetBlocked()
     this.calculateNextCoordinates()
     this.updatePreviousCoordinates()
@@ -108,7 +112,7 @@ export default class ConcreteEnemy extends Enemy {
         this.followTheShortestPath()
       }
     }
-    else {
+    else { // Target is in line of sight
       if (this.pathfindingNodes) {
         this.pathfindingNodes = null
       }
@@ -135,7 +139,7 @@ export default class ConcreteEnemy extends Enemy {
     this.moveTowards(nextNodeX, nextNodeY)
   }
 
-  private moveTowardsPlayer(player: Player): void {
+  private moveTowardsPlayer(player: Point): void {
     if (this.distanceFromPlayer > this.collisionBox.width) {
       this.moveTowards(player.x, player.y)
     }
